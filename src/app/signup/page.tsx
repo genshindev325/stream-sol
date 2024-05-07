@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation";
 import { MdClose } from "react-icons/md";
 
 /// Built-in imports
-import axios from "axios";
 import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
 import { Button } from "@/components/common";
+import { signUp } from "@/services/user";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -23,6 +23,15 @@ export default function SignUp() {
 
   const router = useRouter();
   const { disconnect } = useWallet();
+
+  const register = async () => {
+    try {
+
+      await signUp();
+    } catch(err) {
+
+    }
+  };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-50 bg-background">
@@ -122,7 +131,7 @@ export default function SignUp() {
             primary
             handleClick={() => {
               if (!loading) {
-                // createProfile();
+                register();
               }
             }}
           />

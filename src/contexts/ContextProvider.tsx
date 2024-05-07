@@ -19,6 +19,7 @@ import {
 
 /// Custom
 import { AutoConnectProvider, useAutoConnect } from "./AutoConnectProvider";
+import { AuthContextProvider } from "./AuthContextProvider";
 import { NetworkConfigurationProvider } from "./NetworkConfigurationProvider";
 import { RPC_ENDPOINT, HUDDLE_PROJECT_ID } from "@/libs/constants";
 
@@ -62,7 +63,10 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
         autoConnect={autoConnect}
       >
         <ReactUIWalletModalProviderDynamic>
+          <AuthContextProvider>
+
           {children}
+          </AuthContextProvider>
         </ReactUIWalletModalProviderDynamic>
       </WalletProvider>
     </ConnectionProvider>

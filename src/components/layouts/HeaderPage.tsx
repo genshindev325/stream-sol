@@ -1,6 +1,6 @@
 "use client"; // This is a client component
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -26,14 +26,18 @@ import { BsCameraVideo } from "react-icons/bs";
 /// Built-in
 import { useDebouncedCallback } from "use-debounce";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { isMobile } from "react-device-detect";
 
 /// Custom
 import { Dropdown, DropdownItem, AvatarComponent } from "../common";
+import { useAuthConnect } from "@/contexts/AuthContextProvider";
+import { getAccessToken, setAccessToken } from "@/libs/helpers";
+import { createAuthToken, verifyToken } from "@/services/auth";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
 import cameraPic from "@/assets/svgs/camera.svg";
+import { User } from "@/libs/types";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -44,10 +48,9 @@ const WalletMultiButtonDynamic = dynamic(
 export default function HeaderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  const user = null;
-
-  const { publicKey, disconnect } = useWallet();
+  const { publicKey, disconnecting, signMessage, disconnect } = useWallet();
+  const { user, setUser } = useAuthConnect();
+  const [loading, setLoading] = useState(false);
 
   const handleSearch = useDebouncedCallback((term) => {
     const params = new URLSearchParams(searchParams);
@@ -59,6 +62,42 @@ export default function HeaderPage() {
       router.replace(`/`);
     }
   }, 500);
+
+  useEffect(() => {
+    if (publicKey && signMessage) {
+      (async function () {
+        setLoading(true);
+        try {
+          let token: string | null = getAccessToken();
+          let _user: User | null = null;
+
+          if (!token) {
+            token = await createAuthToken({
+              signMessage: signMessage,
+              publicKey,
+            });
+          }
+
+          const { _user: user } = await verifyToken(token);
+          setUser(_user);
+
+          if (_user === null) {
+          }
+        } catch (err) {
+          setUser(null);
+          disconnect();
+        }
+        setLoading(false);
+      })();
+    }
+  }, [publicKey]);
+
+  useEffect(() => {
+    if (disconnecting) {
+      setUser(null);
+      setAccessToken(null);
+    }
+  }, [disconnecting]);
 
   return (
     <div className="flex justify-between items-center sticky bg-background h-[64px] top-0 px-4 md:px-8 z-10 border-b border-1 border-solid border-[#FFFFFF0D] rounded-b-[40px]">
@@ -91,7 +130,7 @@ export default function HeaderPage() {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        {user ? (
+        {user !== null ? (
           <Dropdown
             trigger={
               <div className="bg-grey-900 w-[44px] h-[44px] rounded-lg hidden md:flex justify-center items-center hover:cursor-pointer">
@@ -133,9 +172,9 @@ export default function HeaderPage() {
             <Image src={cameraPic} alt="camera" width={28} height={24} />
           </div>
         )}
-        <WalletMultiButton>
+        <WalletMultiButtonDynamic>
           {!publicKey && "Connect Wallet"}
-        </WalletMultiButton>
+        </WalletMultiButtonDynamic>
 
         <Dropdown
           trigger={
@@ -160,17 +199,17 @@ export default function HeaderPage() {
             </div>
           </DropdownItem>
         </Dropdown>
-        {user ? (
+        {user !== null ? (
           <Dropdown
             trigger={
               <div className="relative min-w-[44px] w-[44px] h-[44px] rounded-full hover:cursor-pointer">
-                <AvatarComponent avatar={user?.avatar} size={44} />
+                {/* <AvatarComponent avatar={user?.avatar} size={44} /> */}
               </div>
             }
           >
             <DropdownItem>
               <div className="flex gap-2 px-4 py-2 border-b border-1 border-solid border-[#FFFFFF0D]">
-                <AvatarComponent avatar={user?.avatar} size={44} />
+                {/* <AvatarComponent avatar={user?.avatar} size={44} /> */}
                 <div>
                   <div className="text-white text-[0.8em]">
                     {user?.firstname + " " + user?.lastname}
