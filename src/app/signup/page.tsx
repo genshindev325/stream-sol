@@ -13,6 +13,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 /// Custom
 import { Button } from "@/components/common";
 import { signUp } from "@/services/user";
+import { uniqueUsername } from "@/services/profile";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -22,7 +23,7 @@ export default function SignUp() {
   const [description, setDescription] = useState("");
 
   const router = useRouter();
-  const { disconnect } = useWallet();
+  const { publicKey, disconnect } = useWallet();
 
   const validateForm = () => {
     const regexName = /^[A-Za-z]+$/;
@@ -60,12 +61,22 @@ export default function SignUp() {
   };
 
   const register = async () => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+
     const isValid = validateForm();
     if (!isValid) {
       return;
     }
     setLoading(true);
     try {
+      const isUnique = await uniqueUsername(username, publicKey.toBase58());
+      if (!isUnique) {
+        toast.error("Username was already used", { duration: 3000 });
+        return;
+      }
       await signUp({
         firstname,
         lastname,

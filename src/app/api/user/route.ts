@@ -33,3 +33,37 @@ export async function POST(req: Request) {
     { status: HttpStatusCode.Created }
   );
 }
+
+export async function PUT(req: Request) {
+  const userPk = req.headers.get("user");
+
+  const userData = await req.json();
+
+  await connectMongo();
+
+  console.log(userData)
+  const user = await UserModel.findOneAndUpdate(
+    {
+      $or: [{ publickey: userPk }, { username: userData.username }],
+    },
+    {
+      ...userData,
+    }
+  );
+
+  if (!user) {
+    return NextResponse.json(
+      { message: "User Does Not Exist" },
+      { status: HttpStatusCode.NotFound }
+    );
+  }
+
+  const newUser = await UserModel.findOne({
+    $or: [{ publickey: userPk }, { username: userData.username }],
+  });
+
+  return NextResponse.json(
+    { user: newUser },
+    { status: HttpStatusCode.Created }
+  );
+}

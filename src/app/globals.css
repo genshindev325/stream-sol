@@ -75,3 +75,21 @@ body {
   box-shadow: 0px 14px 32px 0px #08080880;
   background: #19161c;
 }
+
+.bg-profile {
+  background: linear-gradient(90deg, #19fb9b 0%, #9945ff 100%);
+}
+
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.modal-center {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

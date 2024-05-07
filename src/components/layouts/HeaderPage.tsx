@@ -8,13 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 /// Icons
 import { CiSearch } from "react-icons/ci";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { RiVideoLine } from "react-icons/ri";
-import {
-  MdHelpOutline,
-  MdOutlineFeedback,
-  MdLogout,
-  MdOutlineAnnouncement,
-} from "react-icons/md";
+import { MdHelpOutline, MdOutlineFeedback, MdLogout } from "react-icons/md";
 import { TbUserEdit } from "react-icons/tb";
 import { BsCameraVideo } from "react-icons/bs";
 
@@ -24,14 +18,13 @@ import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
 import { Dropdown, DropdownItem, AvatarComponent } from "../common";
-import { useAuthConnect } from "@/contexts/AuthContextProvider";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { getAccessToken, setAccessToken } from "@/libs/helpers";
 import { createAuthToken, verifyToken } from "@/services/auth";
+import { User } from "@/libs/types";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
-import cameraPic from "@/assets/svgs/camera.svg";
-import { User } from "@/libs/types";
 
 const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -47,7 +40,7 @@ export default function HeaderPage({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { publicKey, disconnecting, signMessage, disconnect } = useWallet();
-  const { user, setUser } = useAuthConnect();
+  const { user, setUser } = useAuthContext();
   const [loading, setLoading] = useState(false);
 
   const handleSearch = useDebouncedCallback((term) => {
@@ -152,43 +145,6 @@ export default function HeaderPage({
             </div>
           </DropdownItem>
         </Dropdown>
-        {user !== null ? (
-          <Dropdown
-            trigger={
-              <div className="bg-grey-900 w-[44px] h-[44px] rounded-lg hidden md:flex justify-center items-center hover:cursor-pointer">
-                <Image src={cameraPic} alt="Camera" width={28} height={24} />
-              </div>
-            }
-            right={false}
-          >
-            <DropdownItem>
-              <div
-                className="flex gap-2 px-4 py-2 mx-4 my-1 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
-                onClick={() => {
-                  router.push("/upload-video");
-                }}
-              >
-                <RiVideoLine size={24} />
-                Upload Video
-              </div>
-            </DropdownItem>
-            <DropdownItem>
-              <div
-                className="flex gap-2 px-4 py-2 mx-4 my-1 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
-                onClick={() => {
-                  // router.push(`/profile/${user?.username}?tab=announcements`);
-                }}
-              >
-                <MdOutlineAnnouncement size={24} />
-                Create Announcement
-              </div>
-            </DropdownItem>
-          </Dropdown>
-        ) : (
-          <div className="bg-grey-900 w-[44px] h-[44px] rounded-lg hidden md:flex justify-center items-center hover:cursor-pointer">
-            <Image src={cameraPic} alt="camera" width={28} height={24} />
-          </div>
-        )}
         <WalletMultiButtonDynamic>
           {!publicKey && "Connect Wallet"}
         </WalletMultiButtonDynamic>
@@ -218,7 +174,7 @@ export default function HeaderPage({
               <div
                 className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
                 onClick={() => {
-                  router.push("/edit-profile");
+                  router.push("/profile");
                 }}
               >
                 <TbUserEdit size={20} />

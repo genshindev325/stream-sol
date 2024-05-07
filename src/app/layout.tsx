@@ -20,6 +20,11 @@ const neueMontrealFont = localFont({
       style: "normal",
     },
     {
+      path: "../assets/fonts/NeueMontreal-Medium.otf",
+      weight: "600",
+      style: "medium",
+    },
+    {
       path: "../assets/fonts/NeueMontreal-Bold.otf",
       weight: "700",
       style: "bold",

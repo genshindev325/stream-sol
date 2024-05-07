@@ -18,7 +18,7 @@ export default function LayoutPage({
         siderVisible={siderVisible}
         setSiderVisible={setSiderVisible}
       />
-      <div className={`p-2 sm:p-4 md:ml-[280px] ${siderVisible ? "ml-[280px]" : "ml-0"}`}>
+      <div className={`p-4 sm:p-6 md:ml-[280px] ${siderVisible ? "ml-[280px]" : "ml-0"}`}>
         {children}
       </div>
     </main>

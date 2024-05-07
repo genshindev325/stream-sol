@@ -11,5 +11,6 @@ export async function POST(req: Request) {
     publickey: userPk,
   });
 
+
   return NextResponse.json({ user: oldUser }, { status: 200 });
 }

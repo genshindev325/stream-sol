@@ -1,12 +1,11 @@
 "use client"; // This is a client component
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 /// Icons
-import { RiVideoLine } from "react-icons/ri";
 import { GoHome } from "react-icons/go";
 import { CiStreamOn } from "react-icons/ci";
 import {
@@ -17,13 +16,11 @@ import {
 import { TbUserUp, TbUserDown } from "react-icons/tb";
 
 /// Custom
-import { Dropdown, DropdownItem } from "../common";
-import { useAuthConnect } from "@/contexts/AuthContextProvider";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { ADMIN_WALLETS } from "@/libs/constants";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
-import cameraPic from "@/assets/svgs/camera.svg";
 
 export default function SiderPage({
   siderVisible,
@@ -32,7 +29,7 @@ export default function SiderPage({
   siderVisible: boolean;
   setSiderVisible: (visible: boolean) => void;
 }) {
-  const { user } = useAuthConnect();
+  const { user } = useAuthContext();
   const router = useRouter();
   const pathname = usePathname();
   const selected = pathname.split("/")[1];
@@ -50,43 +47,6 @@ export default function SiderPage({
           alt="Picture of the Logo"
           className="w-[120px] h-[28px]"
         />
-        {user ? (
-          <Dropdown
-            trigger={
-              <div className="bg-grey-900 w-[44px] h-[44px] rounded-lg flex justify-center items-center hover:cursor-pointer">
-                <Image src={cameraPic} alt="Camera" width={28} height={24} />
-              </div>
-            }
-            right={true}
-          >
-            <DropdownItem>
-              <div
-                className="flex gap-2 px-4 py-2 mx-4 my-1 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
-                onClick={() => {
-                  router.push("/upload-video");
-                }}
-              >
-                <RiVideoLine size={24} />
-                Upload Video
-              </div>
-            </DropdownItem>
-            <DropdownItem>
-              <div
-                className="flex gap-2 px-4 py-2 mx-4 my-1 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
-                onClick={() => {
-                  router.push(`/profile/${user?.username}?tab=announcements`);
-                }}
-              >
-                <MdOutlineAnnouncement size={24} />
-                Create Announcement
-              </div>
-            </DropdownItem>
-          </Dropdown>
-        ) : (
-          <div className="bg-grey-900 w-[44px] h-[44px] rounded-lg flex justify-center items-center hover:cursor-pointer">
-            <Image src={cameraPic} alt="Camera" width={28} height={24} />
-          </div>
-        )}
       </div>
 
       <MdClose
@@ -118,7 +78,7 @@ export default function SiderPage({
 
           <div className="h-[1px] w-full bg-grey-800"></div>
 
-          {/* My Channel Sidebar */}
+          {/* Create LiveStream */}
 
           <Link
             href="/livestream"
@@ -135,6 +95,25 @@ export default function SiderPage({
             />
 
             <span className="font-semibold block">Create LiveStream</span>
+          </Link>
+
+          {/* Create Announcement */}
+
+          <Link
+            href="/announcement"
+            className={
+              "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
+              (selected === "announcement"
+                ? " text-white bg-[#FFFFFF0A]"
+                : " text-grey-400 hover:bg-[#FFFFFF0A]")
+            }
+          >
+            <MdOutlineAnnouncement
+              size={24}
+              color={selected === "announcement" ? "white" : "#BFBFBF"}
+            />
+
+            <span className="font-semibold block">Announcement</span>
           </Link>
 
           {/* Following */}

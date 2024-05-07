@@ -39,6 +39,7 @@ export const verifyToken = async (token: string) : Promise<User | null> => {
       },
     }
   );
+
   setAccessToken(token);
   return data.user;
 };

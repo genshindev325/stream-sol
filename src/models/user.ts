@@ -6,6 +6,8 @@ export interface IUser {
   username: string;
   description?: string;
   publickey: string;
+  avatar?: string;
+  banner?: string;
 }
 const UserSchema = new Schema<IUser>(
   {
@@ -28,6 +30,14 @@ const UserSchema = new Schema<IUser>(
     publickey: {
       type: String,
       required: true,
+    },
+    avatar: {
+      type: String,
+      required: false,
+    },
+    banner: {
+      type: String,
+      required: false,
     },
   },
   {
