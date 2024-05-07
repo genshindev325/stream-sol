@@ -11,9 +11,9 @@ import { useWallet } from "@solana/wallet-adapter-react";
 /// Custom Import
 import { Button } from "@/components/common";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-// import CropHeader from "@/components/edit-profile/CropHeader";
+import BannerUpload from "@/components/profile/BannerUpload";
 import AvatarUpload from "@/components/profile/AvatarUpload";
-import FullLoading from "@/components/common/FullLoading";
+import { FullLoading } from "@/components/common";
 import { uniqueUsername, updateProfile } from "@/services/profile";
 
 /// Images
@@ -296,17 +296,14 @@ export default function EditProfile() {
           <Button text="Update" primary handleClick={editProfile} />
         </div>
       </div>
-      {/* {cropHeaderVisible && (
-        <CropHeader
+      {cropHeaderVisible && (
+        <BannerUpload
           onClose={() => {
             setCropHeaderVisible(false);
           }}
           setLoading={setLoading}
-          onRefetch={() => {
-            setRefetch((prev) => !prev);
-          }}
         />
-      )} */}
+      )}
 
       {avatarVisible && (
         <AvatarUpload
