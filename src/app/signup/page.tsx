@@ -24,13 +24,58 @@ export default function SignUp() {
   const router = useRouter();
   const { disconnect } = useWallet();
 
-  const register = async () => {
-    try {
+  const validateForm = () => {
+    const regexName = /^[A-Za-z]+$/;
+    const regexUserName = /^[A-Za-z0-9_]+$/;
 
-      await signUp();
-    } catch(err) {
-
+    if (!regexName.test(firstname)) {
+      toast.error("First Name must be valid name", { duration: 3000 });
+      return false;
     }
+
+    if (lastname !== "" && !regexName.test(lastname)) {
+      toast.error("Last Name must be valid name", { duration: 3000 });
+      return false;
+    }
+
+    if (!regexUserName.test(username)) {
+      toast.error("User Name must be valid name", { duration: 3000 });
+      return false;
+    }
+
+    if (username.length >= 13) {
+      toast.error("User Name must be less than 13 characters", {
+        duration: 3000,
+      });
+      return false;
+    }
+
+    if (description.length > 200) {
+      toast.error("Description must be less than 200 characters", {
+        duration: 3000,
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const register = async () => {
+    const isValid = validateForm();
+    if (!isValid) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await signUp({
+        firstname,
+        lastname,
+        username,
+        description,
+      });
+      toast.success("Successfully Created", { duration: 3000 });
+      router.push("/");
+    } catch (err) {}
+    setLoading(false);
   };
 
   return (

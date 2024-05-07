@@ -29,7 +29,7 @@ export function Dropdown({
       {show && (
         <ul
           className={
-            "w-[280px] mt-4 absolute custom-shadow rounded-lg overflow-hidden" +
+            "w-[280px] mt-4 absolute dropdown-shadow rounded-lg overflow-hidden" +
             (right ? " right-0" : " left-0")
           }
           onClick={() => {

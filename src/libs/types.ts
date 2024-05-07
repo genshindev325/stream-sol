@@ -3,6 +3,7 @@ export type User = {
   lastname?: string;
   username: string;
   description?: string;
+  publickey: string;
   avatar?: string;
   banner?: string;
 };

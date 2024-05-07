@@ -1,9 +1,10 @@
 import { DateTime } from "luxon";
 import b58 from "bs58";
+import axios from "axios";
 import { PublicKey } from "@solana/web3.js";
 import { setAccessToken } from "@/libs/helpers";
-import axios from "axios";
-import { API_CONFIG } from "../libs/constants";
+import { API_CONFIG } from "@/libs/constants";
+import { User } from "@/libs/types";
 
 type MessageSigner = {
   signMessage(message: Uint8Array): Promise<Uint8Array>;
@@ -28,7 +29,7 @@ export const createAuthToken = async (
   return `${pk}.${msg}.${sig}`;
 };
 
-export const verifyToken = async (token: string) => {
+export const verifyToken = async (token: string) : Promise<User | null> => {
   const { data } = await axios.post(
     `${API_CONFIG}/auth/verify-token`,
     {},
@@ -39,5 +40,5 @@ export const verifyToken = async (token: string) => {
     }
   );
   setAccessToken(token);
-  return data;
+  return data.user;
 };

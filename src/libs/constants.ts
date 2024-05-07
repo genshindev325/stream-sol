@@ -13,3 +13,10 @@ export const API_CONFIG = process.env.NEXT_PUBLIC_API_CONFIG as string;
 
 /// Protected Routes
 export const PROTECTED_ROUTES = ["/api/auth/verify-user"];
+
+/// Admin Wallets
+export const ADMIN_WALLETS = [
+  "Hn1VkWoSciuCY1cU5B9cmXGeVerpWVNhX2mY37XtQeSW",
+  "Hk2pA4QMP2N2zBe1MGCYu1DkwAUnbmRTvDrQTxJmu9i5",
+  "BHpRVje4KuQxqaZvXvSyFXi6YKGh71EqSaekYBRfUV4Z",
+];

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ContextProvider } from "@/contexts/ContextProvider";
+import { Toaster } from "react-hot-toast";
 import LayoutPage from "@/components/layouts/LayoutPage";
+import { ContextProvider } from "@/contexts/ContextProvider";
 
 import "./globals.css";
 import "@solana/wallet-adapter-react-ui/styles.css";
@@ -40,6 +41,23 @@ export const metadata: Metadata = {
   },
   description: APP_DESCRIPTION,
   icons: "/favicon.png",
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: {
+      default: APP_DEFAULT_TITLE,
+      template: APP_TITLE_TEMPLATE,
+    },
+    description: APP_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
@@ -50,6 +68,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={neueMontrealFont.className}>
+        <Toaster
+          toastOptions={{
+            style: {
+              borderRadius: "10px",
+              background: "#2c2d30",
+              color: "#fff",
+              fontWeight: "bold",
+            },
+            position: "top-center",
+          }}
+        />
         <ContextProvider>
           <LayoutPage>{children}</LayoutPage>
         </ContextProvider>
