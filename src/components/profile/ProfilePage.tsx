@@ -22,7 +22,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 // } from "@/components/profile";
 import { FullLoading } from "@/components/common";
 import { addressShow, formatK } from "@/libs/helpers";
-import { getProfileByUsername } from "@/services/profile";
+import { isFollower, follow } from "@/services/profile";
 
 /// Images
 import userPic from "@/assets/svgs/user.svg";
@@ -33,18 +33,15 @@ type Props = {
 };
 
 export default function ProfilePage({ profile }: Props) {
-  const [loading, setLoading] = useState(false);
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab") || "";
   const pathname = usePathname();
   const router = useRouter();
-  // const username = params.uid;
-
-  // const [profile, setProfile] = useState<User | null>();
-
   const { publicKey } = useWallet();
-  const [followed, setFollowed] = useState(false);
-  const [donated, setDonated] = useState(false);
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const [followed, setFollowed] = useState<boolean>(false);
+  const [donated, setDonated] = useState<boolean>(false);
 
   const selectTab = (value: string) => {
     const params = new URLSearchParams(searchParams);
@@ -58,78 +55,43 @@ export default function ProfilePage({ profile }: Props) {
       toast.error("Connect your wallet", { duration: 3000 });
       return;
     }
-    // if (pk) {
-    //   setLoading(true);
-    //   try {
-    //     const token = getAccessToken();
-    //     await axios.post(
-    //       `${API_CONFIG}/follow`,
-    //       { follower: pk },
-    //       {
-    //         headers: {
-    //           Authorization: "Bearer " + token,
-    //         },
-    //       }
-    //     );
-
-    //     setRefetch((prev) => !prev);
-    //   } catch (err: any) {
-    //     if (err?.response?.status === 404) {
-    //       toast.error("You must add your profile", { duration: 3000 });
-    //     }
-    //     console.error(err);
-    //   }
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    try {
+      const data = await follow(profile.publickey);
+      setFollowed(data.follow);
+    } catch (err: any) {
+      toast.error(`Failed to ${followed ? "Unfollow" : "Follow"}`, {
+        duration: 3000,
+      });
+    }
+    setLoading(false);
   };
 
-  // useEffect(() => {
-  //   if (username) {
-  //     (async function () {
-  //       setLoading(true);
-  //       try {
-  //         const _profile = await getProfileByUsername(username);
-  //         // setProfile(_profile);
-  //       } catch (err) {
-  //         router.push("/not-found");
-  //       }
-  //       setLoading(false);
-  //     })();
-  //   }
-  // }, [username]);
+  useEffect(() => {
+    if (publicKey) {
+      (async function () {
+        setLoading(true);
+        try {
+          const _followed = await isFollower(
+            profile.publickey,
+            publicKey.toBase58()
+          );
+          setFollowed(_followed);
+        } catch (err) {}
+        setLoading(false);
+      })();
+    }
+  }, [publicKey]);
 
-  // useEffect(() => {
-  //   if (pk && publicKey) {
-  //     setLoading(true);
-  //     const token = getAccessToken();
-  //     axios
-  //       .get(`${API_CONFIG}/profile/is-followed/${pk}`, {
-  //         headers: {
-  //           Authorization: "Bearer " + token,
-  //         },
-  //       })
-  //       .then(({ data }) => {
-  //         if (data.followed) {
-  //           setFollowed(true);
-  //         } else {
-  //           setFollowed(false);
-  //         }
-  //       })
-  //       .catch((err) => {})
-  //       .finally(() => {
-  //         setLoading(false);
-  //       });
-  //   }
-  // }, [publicKey, pk, refetch]);
-
-  // useEffect(() => {
-  //   if (tab !== "videos" && tab !== "announcements" && tab !== "subscribers") {
-  //     selectTab("videos");
-  //   }
-  // }, [tab]);
+  useEffect(() => {
+    if (tab !== "videos" && tab !== "announcements" && tab !== "followers") {
+      selectTab("videos");
+    }
+  }, [tab]);
 
   return (
     <div className="relative w-full h-full mb-[32px] sm:mb-[48px]">
+      {loading && <FullLoading />}
       <div className="mx-auto flex-1 sm:w-[360px] lg:w-[600px] xl:w-[960px] 2xl:w-[1200px]">
         {profile?.banner ? (
           <img
@@ -179,7 +141,7 @@ export default function ProfilePage({ profile }: Props) {
               <div className="text-[0.75rem] sm:text-[0.875rem]">
                 {profile.followers === 0 ? "No" : formatK(profile.followers)}{" "}
                 Followers •{" "}
-                {profile.following === 0 ? "No" : formatK(profile.following)}{" "}
+                {profile.followings === 0 ? "No" : formatK(profile.followings)}{" "}
                 Following
               </div>
               <div className="text-[0.75rem] sm:text-[0.875rem] break-words line-clamp-3 w-[240px] lg:w-[300px] xl:w-[400px]">

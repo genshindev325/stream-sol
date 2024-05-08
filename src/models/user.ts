@@ -1,6 +1,10 @@
-import { model, models, Schema } from "mongoose";
+import { models, model, Schema } from "mongoose";
+import MongooseDelete, {
+  SoftDeleteDocument,
+  SoftDeleteModel,
+} from "mongoose-delete";
 
-export interface IUser {
+interface IUserDocument extends SoftDeleteDocument {
   firstname: string;
   lastname?: string;
   username: string;
@@ -9,10 +13,10 @@ export interface IUser {
   avatar?: string;
   banner?: string;
   followers: number;
-  following: number;
+  followings: number;
 }
 
-const UserSchema = new Schema<IUser>(
+const UserSchema = new Schema<IUserDocument>(
   {
     firstname: {
       type: String,
@@ -46,7 +50,7 @@ const UserSchema = new Schema<IUser>(
       type: Number,
       default: 0,
     },
-    following: {
+    followings: {
       type: Number,
       default: 0,
     },
@@ -63,6 +67,14 @@ const UserSchema = new Schema<IUser>(
   }
 );
 
-const UserModel = models.User || model("User", UserSchema);
+UserSchema.plugin(MongooseDelete, {
+  overrideMethods: "all",
+  deletedBy: true,
+  deletedByType: String,
+});
+
+const UserModel =
+  (models.User as SoftDeleteModel<IUserDocument>) ||
+  model<IUserDocument, SoftDeleteModel<IUserDocument>>("User", UserSchema);
 
 export default UserModel;

@@ -32,7 +32,7 @@ export default function AvatarComponent({
             alt="user"
             width={size / 2}
             height={size / 2}
-            priority={true}
+            priority
           />
         </div>
       )}

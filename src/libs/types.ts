@@ -7,5 +7,5 @@ export type User = {
   avatar?: string;
   banner?: string;
   followers: number;
-  following: number;
+  followings: number;
 };

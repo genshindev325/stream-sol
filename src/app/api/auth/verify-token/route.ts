@@ -7,10 +7,13 @@ export async function POST(req: Request) {
 
   await connectMongo();
 
+  console.log(userPk)
+
   const oldUser = await UserModel.findOne({
     publickey: userPk,
   });
 
+  console.log(userPk)
 
   return NextResponse.json({ user: oldUser }, { status: 200 });
 }

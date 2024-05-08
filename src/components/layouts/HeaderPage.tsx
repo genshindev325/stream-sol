@@ -105,6 +105,7 @@ export default function HeaderPage({
         src={logoPic}
         alt="Picture of the Logo"
         className="hidden md:block w-[120px] h-[28px]"
+        priority
       />
       <div className="hidden lg:flex flex-row items-center p-2 gap-2 w-[320px] h-[40px] rounded-lg border border-1 border-solid border-[#FFFFFF0D]">
         <div className="text-grey-300">

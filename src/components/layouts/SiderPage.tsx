@@ -1,9 +1,9 @@
 "use client"; // This is a client component
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 /// Icons
 import { GoHome } from "react-icons/go";
@@ -30,9 +30,12 @@ export default function SiderPage({
   setSiderVisible: (visible: boolean) => void;
 }) {
   const { user } = useAuthContext();
-  const router = useRouter();
   const pathname = usePathname();
   const selected = pathname.split("/")[1];
+
+  useEffect(() => {
+    setSiderVisible(false);
+  }, [selected]);
 
   return (
     <div
