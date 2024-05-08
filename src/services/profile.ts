@@ -2,6 +2,13 @@ import axios from "axios";
 import { API_CONFIG } from "../libs/constants";
 import { getAccessToken } from "@/libs/helpers";
 
+export const getProfileByUsername = async (username: string) => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/user/username?username=${username}`
+  );
+  return data.user;
+};
+
 export const uniqueUsername = async (username: string, publicKey: string) => {
   const { data } = await axios.get(
     `${API_CONFIG}/user/unique/${username}?publicKey=${publicKey}`

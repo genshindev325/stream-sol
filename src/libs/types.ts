@@ -6,4 +6,6 @@ export type User = {
   publickey: string;
   avatar?: string;
   banner?: string;
+  followers: number;
+  following: number;
 };

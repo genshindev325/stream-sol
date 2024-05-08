@@ -11,9 +11,10 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
-import { Button } from "@/components/common";
+import { Button, FullLoading } from "@/components/common";
 import { signUp } from "@/services/user";
 import { uniqueUsername } from "@/services/profile";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,7 @@ export default function SignUp() {
 
   const router = useRouter();
   const { publicKey, disconnect } = useWallet();
+  const { setUser } = useAuthContext();
 
   const validateForm = () => {
     const regexName = /^[A-Za-z]+$/;
@@ -77,12 +79,13 @@ export default function SignUp() {
         toast.error("Username was already used", { duration: 3000 });
         return;
       }
-      await signUp({
+      const user = await signUp({
         firstname,
         lastname,
         username,
         description,
       });
+      setUser(user);
       toast.success("Successfully Created", { duration: 3000 });
       router.push("/");
     } catch (err) {}
@@ -91,6 +94,7 @@ export default function SignUp() {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-50 bg-background">
+      {loading && <FullLoading />}
       <div className="flex flex-col gap-4 text-grey-300 w-[320px] sm:w-[540px] bg-modal rounded-lg p-3 sm:p-6 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <div className="flex justify-between text-[1.25rem] sm:text-[1.5rem] font-bold">
           Create your profile

@@ -8,7 +8,10 @@ export interface IUser {
   publickey: string;
   avatar?: string;
   banner?: string;
+  followers: number;
+  following: number;
 }
+
 const UserSchema = new Schema<IUser>(
   {
     firstname: {
@@ -38,6 +41,14 @@ const UserSchema = new Schema<IUser>(
     banner: {
       type: String,
       required: false,
+    },
+    followers: {
+      type: Number,
+      default: 0,
+    },
+    following: {
+      type: Number,
+      default: 0,
     },
   },
   {

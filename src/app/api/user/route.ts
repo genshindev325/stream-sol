@@ -3,10 +3,10 @@ import UserModel from "@/models/user";
 import { HttpStatusCode } from "axios";
 import connectMongo from "@/libs/connect-mongo";
 
-export async function POST(req: Request) {
-  const userPk = req.headers.get("user");
+export async function POST(request: Request) {
+  const userPk = request.headers.get("user");
 
-  const userData = await req.json();
+  const userData = await request.json();
 
   await connectMongo();
 
@@ -34,14 +34,13 @@ export async function POST(req: Request) {
   );
 }
 
-export async function PUT(req: Request) {
-  const userPk = req.headers.get("user");
+export async function PUT(request: Request) {
+  const userPk = request.headers.get("user");
 
-  const userData = await req.json();
+  const userData = await request.json();
 
   await connectMongo();
 
-  console.log(userData)
   const user = await UserModel.findOneAndUpdate(
     {
       $or: [{ publickey: userPk }, { username: userData.username }],
@@ -62,8 +61,5 @@ export async function PUT(req: Request) {
     $or: [{ publickey: userPk }, { username: userData.username }],
   });
 
-  return NextResponse.json(
-    { user: newUser },
-    { status: HttpStatusCode.Created }
-  );
+  return NextResponse.json({ user: newUser }, { status: HttpStatusCode.Ok });
 }

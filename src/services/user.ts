@@ -23,5 +23,5 @@ export const signUp = async ({
       },
     }
   );
-  return data;
+  return data.user;
 };

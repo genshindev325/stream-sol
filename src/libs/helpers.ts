@@ -62,7 +62,7 @@ export const formatTime = (dateInput: string) => {
   }
 };
 
-export const addressShow = (str: string) => {
+export const addressShow = (str: string): string => {
   if (!str || str.length < 8) {
     return "";
   }
