@@ -123,7 +123,7 @@ export default function ProfilePage({ profile }: Props) {
           <div className="flex flex-col xl:flex-row xl:items-center gap-[16px] w-full text-grey-300">
             <div className="flex-1">
               <div className="text-[1rem] sm:text-[1.25rem] font-semibold">
-                {profile.firstname + " " + (profile?.lastname || "")}
+                {profile.fullname}
               </div>
               <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light hover:cursor-pointer">
                 @{profile.username}&nbsp;&nbsp;(

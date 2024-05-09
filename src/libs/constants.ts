@@ -20,3 +20,6 @@ export const ADMIN_WALLETS = [
   "Hk2pA4QMP2N2zBe1MGCYu1DkwAUnbmRTvDrQTxJmu9i5",
   "BHpRVje4KuQxqaZvXvSyFXi6YKGh71EqSaekYBRfUV4Z",
 ];
+
+/// Items per page
+export const ITEMS_PER_PAGE = 12;

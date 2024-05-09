@@ -27,32 +27,27 @@ export async function POST(request: Request) {
   }
 
   const follow = await FollowModel.findOneWithDeleted({
-    user: userData.user,
-    follower: followerPk,
+    user: {
+      publickey: userData.user,
+    },
+    follower: {
+      publickey: followerPk,
+    },
   });
 
   if (follow && !follow.deleted) {
     user.followers = user.followers === 0 ? 0 : user.followers - 1;
     follower.followings =
       follower.followings === 0 ? 0 : follower.followings - 1;
-    await follow.delete();
+
     await user.save();
     await follower.save();
-    
+    await follow.delete();
+
     return NextResponse.json(
       { success: true, follow: false },
       { status: HttpStatusCode.Ok }
     );
-  }
-
-  if (follow && follow.deleted) {
-    await follow.restore();
-  } else {
-    const newFollow = new FollowModel({
-      user: userData.user,
-      follower: followerPk,
-    });
-    await newFollow.save();
   }
 
   user.followers++;
@@ -60,6 +55,19 @@ export async function POST(request: Request) {
 
   await user.save();
   await follower.save();
+
+  if (follow && follow.deleted) {
+    await follow.restore();
+    follow.user = user;
+    follow.follower = follower;
+    await follow.save();
+  } else {
+    const newFollow = new FollowModel({
+      user,
+      follower,
+    });
+    await newFollow.save();
+  }
 
   return NextResponse.json(
     { success: true, follow: true },

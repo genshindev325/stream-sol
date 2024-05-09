@@ -74,11 +74,6 @@ export default function SignUp() {
     }
     setLoading(true);
     try {
-      const isUnique = await uniqueUsername(username, publicKey.toBase58());
-      if (!isUnique) {
-        toast.error("Username was already used", { duration: 3000 });
-        return;
-      }
       const user = await signUp({
         firstname,
         lastname,
@@ -88,7 +83,14 @@ export default function SignUp() {
       setUser(user);
       toast.success("Successfully Created", { duration: 3000 });
       router.push("/");
-    } catch (err) {}
+    } catch (err: any) {
+      const errors = err?.response?.data?.errors;
+      if (errors?.username?.kind === "unique") {
+        toast.error("Username was already used", { duration: 3000 });
+      } else {
+        toast.error("Failed to Creat your profile", { duration: 3000 });
+      }
+    }
     setLoading(false);
   };
 

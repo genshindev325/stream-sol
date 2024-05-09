@@ -10,28 +10,24 @@ export async function POST(request: Request) {
 
   await connectMongo();
 
-  const oldUser = await UserModel.findOne({
-    $or: [{ publickey: userPk }, { username: userData.username }],
-  });
-
-  if (oldUser) {
-    return NextResponse.json(
-      { message: "User Already Registered" },
-      { status: HttpStatusCode.Conflict }
-    );
-  }
-
   const newUser = new UserModel({
     ...userData,
     publickey: userPk,
   });
 
-  await newUser.save();
+  try {
+    await newUser.save();
 
-  return NextResponse.json(
-    { user: newUser },
-    { status: HttpStatusCode.Created }
-  );
+    return NextResponse.json(
+      { user: newUser },
+      { status: HttpStatusCode.Created }
+    );
+  } catch (err: any) {
+    return NextResponse.json(
+      { errors: err?.errors },
+      { status: HttpStatusCode.BadRequest }
+    );
+  }
 }
 
 export async function PUT(request: Request) {
@@ -41,25 +37,25 @@ export async function PUT(request: Request) {
 
   await connectMongo();
 
-  const user = await UserModel.findOneAndUpdate(
-    {
-      $or: [{ publickey: userPk }, { username: userData.username }],
-    },
-    {
-      ...userData,
-    }
-  );
+  try {
+    const user = await UserModel.findOneAndUpdate(
+      { publickey: userPk },
+      { ...userData },
+      { runValidators: true, context: "query" }
+    );
 
-  if (!user) {
+    if (!user) {
+      return NextResponse.json(
+        { message: "User Does Not Exist" },
+        { status: HttpStatusCode.NotFound }
+      );
+    }
+
+    return NextResponse.json({ user }, { status: HttpStatusCode.Ok });
+  } catch (err: any) {
     return NextResponse.json(
-      { message: "User Does Not Exist" },
-      { status: HttpStatusCode.NotFound }
+      { errors: err?.errors },
+      { status: HttpStatusCode.BadRequest }
     );
   }
-
-  const newUser = await UserModel.findOne({
-    $or: [{ publickey: userPk }, { username: userData.username }],
-  });
-
-  return NextResponse.json({ user: newUser }, { status: HttpStatusCode.Ok });
 }

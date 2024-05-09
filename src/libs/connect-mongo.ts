@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 
 const MONGO_URI = process.env.MONGODB_URI as string;
+
 const cached: {
   connection?: typeof mongoose;
   promise?: Promise<typeof mongoose>;
 } = {};
+
 async function connectMongo() {
   if (!MONGO_URI) {
     throw new Error(

@@ -113,6 +113,7 @@ export default function HeaderPage({
           }
 
           _user = await verifyToken(token);
+
           setUser(_user);
 
           if (_user === null) {
@@ -220,7 +221,7 @@ export default function HeaderPage({
             {!publicKey && "Connect Wallet"}
           </WalletMultiButtonDynamic>
 
-          {user !== null ? (
+          {user ? (
             <Dropdown
               trigger={
                 <div className="relative min-w-[44px] w-[44px] h-[44px] rounded-full hover:cursor-pointer">
@@ -233,7 +234,7 @@ export default function HeaderPage({
                   <AvatarComponent avatar={user?.avatar} size={44} />
                   <div>
                     <div className="text-white text-[0.8em]">
-                      {user?.firstname + " " + user?.lastname}
+                      {user.fullname}
                     </div>
                     <div className="text-white text-[0.75em]">
                       @{user?.username}

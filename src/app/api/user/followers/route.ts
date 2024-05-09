@@ -5,20 +5,13 @@ import connectMongo from "@/libs/connect-mongo";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const user = searchParams.get("user");
-  const follower = searchParams.get("follower");
+  const profileUser = searchParams.get("user");
+  const publicKey = searchParams.get("publicKey");
+  const page = searchParams.get("page");
 
   await connectMongo();
 
-  const follow = await FollowModel.findOne({
-    // "user.publicKey": user,
-    // "follower.publicKey": follower,
-
-    "user.publickey": "FDRJMzFnamyAUdtUo4cipGQrrvoHe4ZZXQomk2E6uoAy",
-    "follower.publickey": "BHpRVje4KuQxqaZvXvSyFXi6YKGh71EqSaekYBRfUV4rZ",
-  });
-
-  console.log(follow);
+  const follow = await FollowModel.findOne({});
 
   if (!follow) {
     return NextResponse.json(

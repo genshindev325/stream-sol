@@ -28,7 +28,6 @@ export default function EditProfile() {
 
   const [banner, setBanner] = useState("");
   const [avatar, setAvatar] = useState("");
-  const [name, setName] = useState("");
   const [pUsername, setPUsername] = useState("");
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname] = useState("");
@@ -90,12 +89,6 @@ export default function EditProfile() {
     }
     setLoading(true);
     try {
-      const isUnique = await uniqueUsername(username, publicKey.toBase58());
-
-      if (!isUnique) {
-        toast.error("Username was already used", { duration: 3000 });
-        return;
-      }
       const udpatedUser = await updateProfile({
         firstname,
         lastname,
@@ -106,8 +99,13 @@ export default function EditProfile() {
       setUser(udpatedUser);
 
       toast.success(`Profile was updated successfully`, { duration: 3000 });
-    } catch (err) {
-      toast.error(`Failed to update your profile`, { duration: 3000 });
+    } catch (err: any) {
+      const errors = err?.response?.data?.errors;
+      if (errors?.username?.kind === "unique") {
+        toast.error("Username was already used", { duration: 3000 });
+      } else {
+        toast.error("Failed to update your profile", { duration: 3000 });
+      }
     }
     setLoading(false);
   };
@@ -121,7 +119,6 @@ export default function EditProfile() {
       setDescription(user?.description || "");
       setBanner(user?.banner || "");
       setAvatar(user?.avatar || "");
-      setName(user.firstname + " " + (user?.lastname || ""));
     }
   }, [user]);
 
@@ -176,7 +173,9 @@ export default function EditProfile() {
           </div>
           <div className="flex flex-col lg:flex-row lg:items-center gap-[16px] w-full">
             <div className="flex-1">
-              <div className="text-[20px] font-semibold">{name}</div>
+              <div className="text-[20px] font-semibold">
+                {user?.fullname || ""}
+              </div>
               <div
                 className="text-[14px] font-light hover:cursor-pointer"
                 onClick={() => {

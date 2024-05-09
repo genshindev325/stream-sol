@@ -10,17 +10,6 @@ export const getProfileByUsername = async (username: string) => {
   return data.user;
 };
 
-/// To check if the user has that follower
-export const isFollower = async (
-  user: string,
-  follower: string
-): Promise<boolean> => {
-  const { data } = await axios.get(
-    `${API_CONFIG}/user/is-following?user=${user}&follower=${follower}`
-  );
-  return data.isFollower;
-};
-
 /// To check if the user name is unique
 export const uniqueUsername = async (username: string, publicKey: string) => {
   const { data } = await axios.get(
@@ -73,4 +62,27 @@ export const follow = async (user: string) => {
     }
   );
   return data;
+};
+
+/// To check if the user has that follower
+export const isFollower = async (
+  user: string,
+  follower: string
+): Promise<boolean> => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/user/is-following?user=${user}&follower=${follower}`
+  );
+  return data.isFollower;
+};
+
+/// To fetch followers
+export const fetchFollowers = async (
+  publicKey: string,
+  user: string,
+  page: number = 1
+) => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/user/followers?publicKey=${publicKey}&user=${user}&page=${page}`
+  );
+  return data.followers;
 };
