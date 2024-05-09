@@ -31,6 +31,8 @@ async function connectMongo() {
     throw e;
   }
 
+  console.log("Connected To MongoDB");
+
   UserModel.watch([], { fullDocument: "updateLookup" }).on(
     "change",
     async (change) => {

@@ -3,86 +3,66 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 
-/// Icons
-import { FaUserCircle } from "react-icons/fa";
-
 /// Built-in
-import axios from "axios";
 import ReactPaginate from "react-paginate";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
-import { NoComponent, PageLoading } from "@/components/common";
-import { API_CONFIG, ITEMS_PER_PAGE } from "@/libs/constants";
-import { getAccessToken } from "@/libs/helpers";
+import { NoComponent, PageLoading, AvatarComponent } from "@/components/common";
+import { ITEMS_PER_PAGE } from "@/libs/constants";
+import { fetchFollowers } from "@/services/profile";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { User } from "@/libs/types";
+import { follow } from "@/services/profile";
 
 /// Images
 import peoplePic from "@/assets/images/people.png";
 
+type Follower = {
+  followed: boolean;
+  user: User;
+};
+
 export default function Followers() {
   const { publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
-  const [subscribers, setSubscribers] = useState<Array<any>>([]);
-  const [pageNum, setPageNum] = useState(0);
   const [pageCount, setPageCount] = useState(0);
-  const [refetch, setRefetch] = useState(false);
+  const [pageNum, setPageNum] = useState(1);
+  const [followers, setFollowers] = useState<Array<Follower>>([]);
+  const { user } = useAuthContext();
 
-  const handlePageClick = (event: any) => {
-    setPageNum(event.selected);
-  };
-
-  const doFollow = async (pk: string) => {
-    if (pk) {
+  const fetchData = async () => {
+    if (publicKey) {
       setLoading(true);
       try {
-        const token = getAccessToken();
-        const { data } = await axios.post(
-          `${API_CONFIG}/follow`,
-          { follower: pk },
-          {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          }
+        const data = await fetchFollowers(
+          publicKey.toBase58(),
+          publicKey.toBase58(),
+          pageNum
         );
-
-        setRefetch((prev) => !prev);
-      } catch (err) {
-        console.error(err);
-      }
+        setFollowers(data.followers);
+        setPageCount(Math.ceil(data.count / ITEMS_PER_PAGE));
+      } catch (err) {}
       setLoading(false);
     }
   };
 
+  const doFollow = async (publickey: string) => {
+    setLoading(true);
+    try {
+      const data = await follow(publickey);
+      await fetchData();
+    } catch (err: any) {}
+    setLoading(false);
+  };
+
   useEffect(() => {
-    if (publicKey) {
-      setLoading(true);
-      const token = getAccessToken();
-      axios
-        .get(
-          `${API_CONFIG}/follow/subscribe/${publicKey?.toBase58()}?page=${
-            pageNum + 1
-          }`,
-          {
-            headers: {
-              Authorization: "Bearer " + token,
-            },
-          }
-        )
-        .then(({ data }) => {
-          if (data.success) {
-            setPageCount(Math.ceil(data.count / ITEMS_PER_PAGE));
-            setSubscribers(data.followers);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [pageNum, publicKey, refetch]);
+    fetchData();
+  }, [pageNum, publicKey]);
+
+  if (!user) {
+    return <NoComponent content="Connect Your Wallet" source={peoplePic} />;
+  }
 
   return (
     <>
@@ -96,36 +76,25 @@ export default function Followers() {
             Your Followers
           </div>
           <div className="flex flex-col px-[16px] gap-[16px]">
-            {subscribers.map((sub) => {
+            {followers.map((follower) => {
               return (
                 <div
                   className="flex justify-between items-center"
-                  key={sub._id}
+                  key={follower.user.id}
                 >
                   <Link
                     className="flex gap-[8px] hover:cursor-pointer"
-                    href={`/profile/${sub.userDetails.username}`}
+                    href={`/profile/${follower.user.username}`}
                   >
-                    {sub.userDetails.avatar === "" ? (
-                      <FaUserCircle size={50} />
-                    ) : (
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${sub.userDetails.avatar}`}
-                        className="w-[48px] h-[48px] rounded-full"
-                        crossOrigin="anonymous"
-                        alt="Avatar"
-                      />
-                    )}
+                    <AvatarComponent avatar={user?.avatar} size={48} />
                     <div className="flex flex-col">
                       <div className="text-[18px]">
-                        {sub.userDetails.firstname +
-                          " " +
-                          sub.userDetails.lastname}
+                        {follower.user.fullname}
                       </div>
                       <div className="text-[14px]">
-                        {sub.userDetails.subscribers === 0
+                        {follower.user.followers === 0
                           ? "No"
-                          : sub.userDetails.subscribers}{" "}
+                          : follower.user.followers}{" "}
                         followers
                       </div>
                     </div>
@@ -133,15 +102,15 @@ export default function Followers() {
                   <div
                     className={
                       "w-[120px] h-[40px] flex justify-center items-center hover:cursor-pointer" +
-                      (sub.followed
+                      (follower.followed
                         ? " border border-[#AE7AFF] bg-white text-[#AE7AFF]"
                         : " bg-[#AE7AFF]")
                     }
                     onClick={() => {
-                      doFollow(sub.user);
+                      doFollow(follower.user.publickey);
                     }}
                   >
-                    {sub.followed ? "Unfollow" : "Follow"}
+                    {follower.followed ? "Unfollow" : "Follow"}
                   </div>
                 </div>
               );
@@ -165,7 +134,9 @@ export default function Followers() {
                 pageCount={pageCount}
                 marginPagesDisplayed={1}
                 pageRangeDisplayed={2}
-                onPageChange={handlePageClick}
+                onPageChange={(event: any) => {
+                  setPageNum(event.selected);
+                }}
                 containerClassName="pagination"
                 activeClassName="active"
                 forcePage={pageNum}

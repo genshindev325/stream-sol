@@ -8,39 +8,22 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const profileUser = searchParams.get("user");
   const page = searchParams.get("page");
-  const publicKey = searchParams.get("publicKey");
 
   await connectMongo();
 
   const totalCount = await FollowModel.countDocuments({
-    "user.publickey": profileUser,
+    "follower.publickey": profileUser,
   });
 
-  const followers = await FollowModel.find({
-    "user.publickey": profileUser,
+  const followings = await FollowModel.find({
+    "follower.publickey": profileUser,
   })
+    .select("user")
     .skip((Number(page) - 1) * ITEMS_PER_PAGE)
     .limit(ITEMS_PER_PAGE);
 
-  const followings = await FollowModel.find({
-    "follower.publickey": publicKey,
-  });
-
-  const data = [];
-
-  for (let i = 0; i < followers.length; i++) {
-    const temp = followings.findIndex((value) => {
-      return value.user.publickey === followers[i].follower.publickey;
-    });
-
-    if (temp !== -1) {
-      data.push({ user: followers[i].follower, followed: true });
-    } else {
-      data.push({ user: followers[i].follower, followed: false });
-    }
-  }
   return NextResponse.json(
-    { followers: data, count: totalCount },
+    { followings, count: totalCount },
     { status: HttpStatusCode.Ok }
   );
 }

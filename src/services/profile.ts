@@ -84,5 +84,17 @@ export const fetchFollowers = async (
   const { data } = await axios.get(
     `${API_CONFIG}/user/followers?publicKey=${publicKey}&user=${user}&page=${page}`
   );
-  return data.followers;
+  return data;
+};
+
+/// To fetch followings
+export const fetchFollowings = async (
+  publicKey: string,
+  user: string,
+  page: number = 1
+) => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/user/followings?publicKey=${publicKey}&user=${user}&page=${page}`
+  );
+  return data;
 };
