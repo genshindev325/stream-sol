@@ -75,7 +75,7 @@ export default function HeaderPage({
           publicKey,
         });
 
-        const _user = await verifyToken(token);
+        const _user = await verifyToken(token, publicKey.toBase58());
         setUser(_user);
 
         if (_user === null) {
@@ -112,7 +112,7 @@ export default function HeaderPage({
             }
           }
 
-          _user = await verifyToken(token);
+          _user = await verifyToken(token, publicKey.toBase58());
 
           setUser(_user);
 

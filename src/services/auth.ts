@@ -29,10 +29,13 @@ export const createAuthToken = async (
   return `${pk}.${msg}.${sig}`;
 };
 
-export const verifyToken = async (token: string) : Promise<User | null> => {
+export const verifyToken = async (
+  token: string,
+  publicKey: string
+): Promise<User | null> => {
   const { data } = await axios.post(
-    `${API_CONFIG}/auth/verify-token`,
-    {},
+    `${API_CONFIG}/auth`,
+    { publicKey },
     {
       headers: {
         Authorization: "Bearer " + token,

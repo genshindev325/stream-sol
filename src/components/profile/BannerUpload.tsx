@@ -44,7 +44,6 @@ export default function BannerUpload({
 
       if (canvas && publicKey) {
         setLoading(true);
-        onClose();
         try {
           const formData = new FormData();
           const file = dataURLtoFile(canvas, `banner_${publicKey}.png`);
@@ -80,13 +79,14 @@ export default function BannerUpload({
         } catch (error) {
           console.error(error);
         }
+        onClose();
         setLoading(false);
       }
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full z-50 bg-[#00000080] text-grey-300">
+    <div className="fixed top-0 left-0 w-full h-full z-30 bg-[#00000080] text-grey-300">
       <div className="modal-center bg-modal rounded-lg p-4 sm:p-6">
         <div className="flex gap-2 sm:gap-4">
           <div className="border border-grey-500 p-[15px] w-[40px] sm:w-[54px] h-[40px] sm:h-[54px] rounded-lg">

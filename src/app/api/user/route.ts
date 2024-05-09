@@ -41,7 +41,7 @@ export async function PUT(request: Request) {
     const user = await UserModel.findOneAndUpdate(
       { publickey: userPk },
       { ...userData },
-      { runValidators: true, context: "query" }
+      { runValidators: true, context: "query", new: true }
     );
 
     if (!user) {

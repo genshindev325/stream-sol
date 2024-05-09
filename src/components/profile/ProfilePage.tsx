@@ -99,6 +99,7 @@ export default function ProfilePage({ profile }: Props) {
             className="w-full rounded-lg"
             crossOrigin="anonymous"
             alt="Banner"
+            fetchPriority="high"
           />
         ) : (
           <div className="w-full h-[90px] lg:h-[150px] xl:h-[240px] bg-profile rounded-lg"></div>

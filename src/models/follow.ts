@@ -1,11 +1,7 @@
-import { model, models, Schema, Types } from "mongoose";
-import MongooseDelete, {
-  SoftDeleteDocument,
-  SoftDeleteModel,
-} from "mongoose-delete";
+import { model, models, Schema } from "mongoose";
 import { IUser, UserSchema } from "./user";
 
-interface IFollow extends SoftDeleteDocument {
+interface IFollow {
   user: IUser;
   follower: IUser;
 }
@@ -33,14 +29,6 @@ const FollowSchema = new Schema<IFollow>(
   }
 );
 
-FollowSchema.plugin(MongooseDelete, {
-  overrideMethods: "all",
-  deletedBy: true,
-  deletedByType: String,
-});
-
-const FollowModel =
-  (models.Follow as SoftDeleteModel<IFollow>) ||
-  model<SoftDeleteModel<IFollow>>("Follow", FollowSchema);
+const FollowModel = models.Follow || model<IFollow>("Follow", FollowSchema);
 
 export default FollowModel;

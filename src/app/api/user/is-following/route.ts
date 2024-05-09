@@ -11,19 +11,14 @@ export async function GET(request: NextRequest) {
   await connectMongo();
 
   const follow = await FollowModel.findOne({
-    // "user.publicKey": user,
-    // "follower.publicKey": follower,
-
-    "user.publickey": "FDRJMzFnamyAUdtUo4cipGQrrvoHe4ZZXQomk2E6uoAy",
-    "follower.publickey": "BHpRVje4KuQxqaZvXvSyFXi6YKGh71EqSaekYBRfUV4rZ",
+    "user.publickey": user,
+    "follower.publickey": follower,
   });
-
-  console.log(follow);
 
   if (!follow) {
     return NextResponse.json(
-      { message: "User Does Not Have That Follower" },
-      { status: HttpStatusCode.NotFound }
+      { isFollower: false },
+      { status: HttpStatusCode.Ok }
     );
   }
 

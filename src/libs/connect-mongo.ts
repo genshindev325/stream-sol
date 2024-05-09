@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import UserModel from "@/models/user";
+import FollowModel from "@/models/follow";
 
 const MONGO_URI = process.env.MONGODB_URI as string;
 
@@ -28,6 +30,36 @@ async function connectMongo() {
     cached.promise = undefined;
     throw e;
   }
+
+  UserModel.watch([], { fullDocument: "updateLookup" }).on(
+    "change",
+    async (change) => {
+      if (change.operationType === "update") {
+        await FollowModel.updateMany(
+          {
+            "follower._id": change.documentKey._id,
+          },
+          {
+            $set: {
+              follower: change.fullDocument,
+            },
+          }
+        );
+
+        await FollowModel.updateMany(
+          {
+            "user._id": change.documentKey._id,
+          },
+          {
+            $set: {
+              user: change.fullDocument,
+            },
+          }
+        );
+      }
+    }
+  );
+
   return cached.connection;
 }
 export default connectMongo;

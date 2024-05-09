@@ -105,23 +105,4 @@ const UserModel =
   (models.User as SoftDeleteModel<IUser>) ||
   model<SoftDeleteModel<IUser>>("User", UserSchema);
 
-// UserModel.watch().on("change", async (change) => {
-//   console.log(change);
-
-// if (change.operationType === "update") {
-//   const follows = await FollowModel.updateMany(
-//     {
-//       "user._id": change.documentKey._id,
-//     },
-//     {
-//       $set: {
-//         user: {
-//           ...change.updateDescription.updatedFields,
-//         },
-//       },
-//     }
-//   );
-// }
-// });
-
 export default UserModel;

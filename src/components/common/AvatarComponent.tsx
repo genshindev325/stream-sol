@@ -24,6 +24,7 @@ export default function AvatarComponent({
           className="w-full h-full rounded-full"
           crossOrigin="anonymous"
           alt="Avatar"
+          fetchPriority="high"
         />
       ) : (
         <div className="bg-grey-900 w-full h-full rounded-full flex justify-center items-center hover:cursor-pointer">

@@ -26,23 +26,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const follow = await FollowModel.findOneWithDeleted({
-    user: {
-      publickey: userData.user,
-    },
-    follower: {
-      publickey: followerPk,
-    },
+  const follow = await FollowModel.findOneAndDelete({
+    "user.publickey": userData.user,
+    "follower.publickey": followerPk,
   });
 
-  if (follow && !follow.deleted) {
-    user.followers = user.followers === 0 ? 0 : user.followers - 1;
-    follower.followings =
-      follower.followings === 0 ? 0 : follower.followings - 1;
+  if (follow) {
+    user.followers--;
+    follower.followings--;
 
     await user.save();
     await follower.save();
-    await follow.delete();
 
     return NextResponse.json(
       { success: true, follow: false },
@@ -56,18 +50,12 @@ export async function POST(request: Request) {
   await user.save();
   await follower.save();
 
-  if (follow && follow.deleted) {
-    await follow.restore();
-    follow.user = user;
-    follow.follower = follower;
-    await follow.save();
-  } else {
-    const newFollow = new FollowModel({
-      user,
-      follower,
-    });
-    await newFollow.save();
-  }
+  const newFollow = new FollowModel({
+    user,
+    follower,
+  });
+
+  await newFollow.save();
 
   return NextResponse.json(
     { success: true, follow: true },

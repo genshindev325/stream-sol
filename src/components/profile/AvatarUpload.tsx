@@ -15,9 +15,11 @@ import { dataURLtoFile } from "@/libs/helpers";
 import { Button } from "../common";
 import { updateProfile } from "@/services/profile";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { User } from "@/libs/types";
 
 /// Images
 import uploadPic from "@/assets/images/upload.png";
+import toast from "react-hot-toast";
 
 export default function AvatarUpload({
   onClose,
@@ -36,7 +38,7 @@ export default function AvatarUpload({
   });
   const { publicKey } = useWallet();
   const imageRef = useRef<AvatarEditor>(null);
-  const { setUser } = useAuthContext();
+  const { user, setUser } = useAuthContext();
 
   const save = async () => {
     if (imageRef) {
@@ -44,7 +46,6 @@ export default function AvatarUpload({
 
       if (canvas && publicKey) {
         setLoading(true);
-        onClose();
         try {
           const formData = new FormData();
           const file = dataURLtoFile(canvas, `avatar_${publicKey}.png`);
@@ -71,22 +72,24 @@ export default function AvatarUpload({
           );
 
           const resData = await res.json();
+          const avatar = resData.IpfsHash || "";
 
           const udpatedUser = await updateProfile({
-            avatar: resData.IpfsHash,
+            avatar,
           });
 
           setUser(udpatedUser);
         } catch (error) {
-          console.error(error);
+          toast.error("Failed to update your avatar", { duration: 3000 });
         }
+        onClose();
         setLoading(false);
       }
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 w-full h-full z-50 bg-[#00000080] text-grey-300">
+    <div className="fixed top-0 left-0 w-full h-full z-30 bg-[#00000080] text-grey-300">
       <div className="modal-center bg-modal rounded-lg p-4 sm:p-6">
         <div className="flex gap-[16px]">
           <div className="border border-grey-500 p-[15px] w-[54px] h-[54px] rounded-lg">
