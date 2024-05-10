@@ -15,6 +15,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom Import
 import Announcement from "./Announcement";
+import Followers from "./Followers";
 import { FullLoading } from "@/components/common";
 import { addressShow, formatK } from "@/libs/helpers";
 import { isFollower, follow } from "@/services/profile";
@@ -221,26 +222,24 @@ export default function ProfilePage({ profile }: Props) {
           <div
             className={
               "text-center py-2 hover:cursor-pointer font-semibold" +
-              (tab === "subscribers"
+              (tab === "followers"
                 ? " text-white border-b border-white"
                 : " text-grey-500")
             }
             onClick={() => {
-              // selectTab("subscribers");
+              selectTab("followers");
             }}
           >
             Followers
           </div>
         </div>
-        {/* {pk &&
-            (tab === "subscribers" ? (
-              <Following profilePk={pk} />
-            ) : tab === "announcements" ? (
-              <Announcement pk={pk} name={name} />
-            ) : (
-              <Videos pk={pk} />
-            ))} */}
-        <Announcement profile={profile} />
+        {tab === "followers" ? (
+          <Followers profile={profile} />
+        ) : tab === "announcements" ? (
+          <Announcement profile={profile} />
+        ) : (
+          <></>
+        )}
       </div>
 
       {/* {donated && (

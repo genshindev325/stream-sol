@@ -66,10 +66,11 @@ export default function Announcement({ profile }: { profile: User }) {
   const fetchData = async () => {
     const pk = publicKey ? publicKey?.toBase58() : "";
     const data = await fetchAnnouncements(pk, profile.publickey, pageNum);
-    setAnnouncements(data.announcements);
     setCount(data.count);
 
-    if (pageNum > 1) {
+    if (pageNum === 1) {
+      setAnnouncements(data.announcements);
+    } else {
       setAnnouncements([...announcements, ...data.announcements]);
     }
   };
@@ -81,7 +82,11 @@ export default function Announcement({ profile }: { profile: User }) {
     setLoading(true);
     try {
       const data = await doLikeAnnouncement(id);
-      await fetchData();
+      if (pageNum === 1) {
+        await fetchData();
+      } else {
+        setPageNum(1);
+      }
     } catch (err) {}
     setLoading(false);
   };
@@ -93,7 +98,11 @@ export default function Announcement({ profile }: { profile: User }) {
     setLoading(true);
     try {
       const data = await doDislikeAnnouncement(id);
-      await fetchData();
+      if (pageNum === 1) {
+        await fetchData();
+      } else {
+        setPageNum(1);
+      }
     } catch (err) {}
     setLoading(false);
   };

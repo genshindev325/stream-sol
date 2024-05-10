@@ -9,6 +9,13 @@ export async function POST(request: Request) {
 
   const userData = await request.json();
 
+  if (followerPk === userData.user) {
+    return NextResponse.json(
+      { message: "You Cannot Follow Yourself" },
+      { status: HttpStatusCode.BadRequest }
+    );
+  }
+
   await connectMongo();
 
   const follower = await UserModel.findOne({
