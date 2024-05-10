@@ -9,12 +9,12 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom Import
-import { Button } from "@/components/common";
+import { Button, NoWallet } from "@/components/common";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import BannerUpload from "@/components/profile/BannerUpload";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import { FullLoading } from "@/components/common";
-import { uniqueUsername, updateProfile } from "@/services/profile";
+import { updateProfile } from "@/services/profile";
 
 /// Images
 import userPic from "@/assets/svgs/user.svg";
@@ -121,6 +121,10 @@ export default function EditProfile() {
       setAvatar(user?.avatar || "");
     }
   }, [user]);
+
+  if (!user) {
+    return <NoWallet />;
+  }
 
   return (
     <>

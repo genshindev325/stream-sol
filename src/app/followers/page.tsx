@@ -8,7 +8,7 @@ import ReactPaginate from "react-paginate";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
-import { NoComponent, PageLoading, AvatarComponent } from "@/components/common";
+import { NoComponent, NoWallet, PageLoading, AvatarComponent } from "@/components/common";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import { fetchFollowers } from "@/services/profile";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
@@ -61,7 +61,7 @@ export default function Followers() {
   }, [pageNum, publicKey]);
 
   if (!user) {
-    return <NoComponent content="Connect Your Wallet" source={peoplePic} />;
+    return <NoWallet />;
   }
 
   return (

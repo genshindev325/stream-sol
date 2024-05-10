@@ -4,21 +4,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-/// React icons
-import { FaChevronDown } from "react-icons/fa6";
-
 /// Built-in Modules
 import axios from "axios";
 import toast from "react-hot-toast";
-import { isMobile } from "react-device-detect";
 
 /// Custom Import
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { Select, DropdownItem } from "@/components/common/Dropdown";
-import { FullLoading, NoComponent } from "@/components/common";
+import { FullLoading, NoWallet } from "@/components/common";
 
 /// Images
-import peoplePic from "@/assets/images/people.png";
 import uploadPic from "@/assets/svgs/upload.svg";
 
 export default function UploadVideo() {
@@ -101,7 +95,7 @@ export default function UploadVideo() {
   }, [thumbnailFile]);
 
   if (!user) {
-    return <NoComponent content="Connect Your Wallet" source={peoplePic} />;
+    return <NoWallet />;
   }
 
   return (

@@ -11,12 +11,9 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
-import { Button, FullLoading, NoComponent } from "@/components/common";
+import { Button, FullLoading, NoWallet } from "@/components/common";
 import { signUp } from "@/services/user";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-
-/// Images
-import peoplePic from "@/assets/images/people.png";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -97,7 +94,7 @@ export default function SignUp() {
   };
 
   if (!publicKey) {
-    return <NoComponent content="Connect Your Wallet" source={peoplePic} />;
+    return <NoWallet />;
   }
 
   return (

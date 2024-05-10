@@ -44,6 +44,10 @@ export default function Announcement({ profile }: { profile: User }) {
   };
 
   const send = async () => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
     if (loading) {
       return;
     }
@@ -76,6 +80,10 @@ export default function Announcement({ profile }: { profile: User }) {
   };
 
   const doLike = async (id: string) => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
     if (loading) {
       return;
     }
@@ -92,6 +100,10 @@ export default function Announcement({ profile }: { profile: User }) {
   };
 
   const doDislike = async (id: string) => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
     if (loading) {
       return;
     }
