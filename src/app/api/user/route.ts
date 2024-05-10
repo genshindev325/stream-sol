@@ -1,7 +1,27 @@
-import { NextResponse } from "next/server";
-import UserModel from "@/models/user";
+import { type NextRequest, NextResponse } from "next/server";
 import { HttpStatusCode } from "axios";
 import connectMongo from "@/libs/connect-mongo";
+import UserModel from "@/models/user";
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const username = searchParams.get("username");
+
+  await connectMongo();
+
+  const user = await UserModel.findOne({
+    username,
+  });
+
+  if (!user) {
+    return NextResponse.json(
+      { message: "User Does Not Exist" },
+      { status: HttpStatusCode.NotFound }
+    );
+  }
+
+  return NextResponse.json({ user }, { status: HttpStatusCode.Ok });
+}
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
@@ -9,6 +29,17 @@ export async function POST(request: Request) {
   const userData = await request.json();
 
   await connectMongo();
+
+  const oldUser = await UserModel.findOne({
+    username: userData.username,
+  });
+
+  if (oldUser) {
+    return NextResponse.json(
+      { errors: "Duplicated username" },
+      { status: HttpStatusCode.Conflict }
+    );
+  }
 
   const newUser = new UserModel({
     ...userData,
@@ -22,11 +53,8 @@ export async function POST(request: Request) {
       { user: newUser },
       { status: HttpStatusCode.Created }
     );
-  } catch (err: any) {
-    return NextResponse.json(
-      { errors: err?.errors },
-      { status: HttpStatusCode.BadRequest }
-    );
+  } catch (errors: any) {
+    return NextResponse.json({ errors }, { status: HttpStatusCode.BadRequest });
   }
 }
 
@@ -37,11 +65,22 @@ export async function PUT(request: Request) {
 
   await connectMongo();
 
+  const oldUser = await UserModel.findOne({
+    $and: [{ publickey: { $ne: userPk } }, { username: userData.username }],
+  });
+
+  if (oldUser) {
+    return NextResponse.json(
+      { errors: "Duplicated username" },
+      { status: HttpStatusCode.Conflict }
+    );
+  }
+
   try {
     const user = await UserModel.findOneAndUpdate(
       { publickey: userPk },
       { ...userData },
-      { runValidators: true, context: "query", new: true }
+      { new: true }
     );
 
     if (!user) {
@@ -52,10 +91,7 @@ export async function PUT(request: Request) {
     }
 
     return NextResponse.json({ user }, { status: HttpStatusCode.Ok });
-  } catch (err: any) {
-    return NextResponse.json(
-      { errors: err?.errors },
-      { status: HttpStatusCode.BadRequest }
-    );
+  } catch (errors: any) {
+    return NextResponse.json({ errors }, { status: HttpStatusCode.BadRequest });
   }
 }

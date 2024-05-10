@@ -1,6 +1,6 @@
 "use client"; // This is a client component
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 /// React icons
@@ -11,10 +11,12 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom
-import { Button, FullLoading } from "@/components/common";
+import { Button, FullLoading, NoComponent } from "@/components/common";
 import { signUp } from "@/services/user";
-import { uniqueUsername } from "@/services/profile";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+
+/// Images
+import peoplePic from "@/assets/images/people.png";
 
 export default function SignUp() {
   const [loading, setLoading] = useState(false);
@@ -46,15 +48,15 @@ export default function SignUp() {
       return false;
     }
 
-    if (username.length >= 13) {
-      toast.error("User Name must be less than 13 characters", {
+    if (username.length > 12) {
+      toast.error("User Name max length is 12", {
         duration: 3000,
       });
       return false;
     }
 
     if (description.length > 200) {
-      toast.error("Description must be less than 200 characters", {
+      toast.error("Description max length is 200", {
         duration: 3000,
       });
       return false;
@@ -84,8 +86,8 @@ export default function SignUp() {
       toast.success("Successfully Created", { duration: 3000 });
       router.push("/");
     } catch (err: any) {
-      const errors = err?.response?.data?.errors;
-      if (errors?.username?.kind === "unique") {
+      const errorStatus = err?.response?.status;
+      if (errorStatus === 409) {
         toast.error("Username was already used", { duration: 3000 });
       } else {
         toast.error("Failed to Creat your profile", { duration: 3000 });
@@ -93,6 +95,10 @@ export default function SignUp() {
     }
     setLoading(false);
   };
+
+  if (!publicKey) {
+    return <NoComponent content="Connect Your Wallet" source={peoplePic} />;
+  }
 
   return (
     <div className="fixed top-0 left-0 w-full h-full z-50 bg-background">

@@ -237,7 +237,7 @@ export default function HeaderPage({
                       {user.fullname}
                     </div>
                     <div className="text-white text-[0.75em]">
-                      @{user?.username}
+                      @{user.username}
                     </div>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export default function HeaderPage({
                 <div
                   className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
                   onClick={() => {
-                    router.push("/my-content");
+                    router.push(`profile/${user.username}`);
                   }}
                 >
                   <BsCameraVideo size={18} />

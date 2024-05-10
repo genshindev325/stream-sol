@@ -100,25 +100,6 @@ export default function SiderPage({
             <span className="font-semibold block">Create LiveStream</span>
           </Link>
 
-          {/* Create Announcement */}
-
-          <Link
-            href="/announcement"
-            className={
-              "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-              (selected === "announcement"
-                ? " text-white bg-[#FFFFFF0A]"
-                : " text-grey-400 hover:bg-[#FFFFFF0A]")
-            }
-          >
-            <MdOutlineAnnouncement
-              size={24}
-              color={selected === "announcement" ? "white" : "#BFBFBF"}
-            />
-
-            <span className="font-semibold block">Announcement</span>
-          </Link>
-
           {/* Following */}
 
           <Link

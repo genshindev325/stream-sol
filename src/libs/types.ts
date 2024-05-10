@@ -11,3 +11,19 @@ export type User = {
   followers: number;
   followings: number;
 };
+
+export enum AlikeEnum {
+  Like,
+  Dislike,
+  None,
+}
+
+export type Announcement = {
+  id: string;
+  user: string;
+  content: string;
+  likes: number;
+  dislikes: number;
+  userLiked: AlikeEnum;
+  createdAt: string;
+};

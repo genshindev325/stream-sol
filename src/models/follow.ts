@@ -18,7 +18,7 @@ const FollowSchema = new Schema<IFollow>(
     },
   },
   {
-    timestamps: true,
+    timestamps: false,
     toJSON: {
       versionKey: false,
       virtuals: true,

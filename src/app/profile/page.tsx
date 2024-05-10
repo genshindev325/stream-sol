@@ -100,8 +100,8 @@ export default function EditProfile() {
 
       toast.success(`Profile was updated successfully`, { duration: 3000 });
     } catch (err: any) {
-      const errors = err?.response?.data?.errors;
-      if (errors?.username?.kind === "unique") {
+      const errorStatus = err?.response?.status;
+      if (errorStatus === 409) {
         toast.error("Username was already used", { duration: 3000 });
       } else {
         toast.error("Failed to update your profile", { duration: 3000 });

@@ -5,17 +5,9 @@ import { getAccessToken } from "@/libs/helpers";
 /// To fetch user data by user name
 export const getProfileByUsername = async (username: string) => {
   const { data } = await axios.get(
-    `${API_CONFIG}/user/username?username=${username}`
+    `${API_CONFIG}/user?username=${username}`
   );
   return data.user;
-};
-
-/// To check if the user name is unique
-export const uniqueUsername = async (username: string, publicKey: string) => {
-  const { data } = await axios.get(
-    `${API_CONFIG}/user/unique/${username}?publicKey=${publicKey}`
-  );
-  return data.unique;
 };
 
 /// To update user data

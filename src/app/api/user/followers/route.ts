@@ -6,9 +6,9 @@ import { ITEMS_PER_PAGE } from "@/libs/constants";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
+  const publicKey = searchParams.get("publicKey");
   const profileUser = searchParams.get("user");
   const page = searchParams.get("page");
-  const publicKey = searchParams.get("publicKey");
 
   await connectMongo();
 

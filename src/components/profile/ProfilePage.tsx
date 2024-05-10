@@ -14,12 +14,7 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom Import
-// import {
-//   Videos,
-//   Announcement,
-//   Following,
-//   DonateModal,
-// } from "@/components/profile";
+import Announcement from "./Announcement";
 import { FullLoading } from "@/components/common";
 import { addressShow, formatK } from "@/libs/helpers";
 import { isFollower, follow } from "@/services/profile";
@@ -218,7 +213,7 @@ export default function ProfilePage({ profile }: Props) {
                 : " text-grey-500")
             }
             onClick={() => {
-              // selectTab("announcements");
+              selectTab("announcements");
             }}
           >
             Announcements
@@ -245,6 +240,7 @@ export default function ProfilePage({ profile }: Props) {
             ) : (
               <Videos pk={pk} />
             ))} */}
+        <Announcement profile={profile} />
       </div>
 
       {/* {donated && (
