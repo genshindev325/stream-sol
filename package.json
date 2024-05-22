@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@huddle01/react": "^2.0.12",
+    "@huddle01/server-sdk": "^2.2.2",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-react": "^0.15.35",
     "@solana/wallet-adapter-react-ui": "^0.9.35",

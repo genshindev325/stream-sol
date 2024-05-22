@@ -27,3 +27,7 @@ export type Announcement = {
   userLiked: AlikeEnum;
   createdAt: string;
 };
+
+export type TPeerMetadata = {
+  displayName: string;
+};
