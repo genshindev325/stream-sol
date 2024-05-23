@@ -110,6 +110,8 @@ export default function UploadVideo() {
 
     setLoading(true);
     try {
+      const roomId = await createHuddleRoom(title);
+
       const options = JSON.stringify({
         cidVersion: 1,
       });
@@ -132,16 +134,16 @@ export default function UploadVideo() {
 
       const imageHashValue = resImage.data.IpfsHash;
 
+      toast.success("Successfully uploaded", { duration: 3000 });
       const livestream = await createLivestream({
         title,
         description,
         text,
         link,
         thumbnail: imageHashValue,
+        roomId,
       });
-
-      toast.success("Successfully uploaded", { duration: 3000 });
-      const roomId = await createHuddleRoom(title);
+      console.log(">>>>>>", livestream);
       router.push(`/livestream/${roomId}`);
     } catch (err) {
       toast.error("Failed to create a livestream", { duration: 3000 });

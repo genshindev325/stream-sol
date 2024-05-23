@@ -13,6 +13,7 @@ export interface ILivestream extends SoftDeleteDocument {
   link: string;
   views: number;
   creator: string;
+  roomId: string;
 }
 
 export const LivestreamSchema = new Schema<ILivestream>(
@@ -62,6 +63,12 @@ export const LivestreamSchema = new Schema<ILivestream>(
 
     /// Creator
     creator: {
+      type: String,
+      required: true,
+    },
+
+    /// Huddle Room Id
+    roomId: {
       type: String,
       required: true,
     },

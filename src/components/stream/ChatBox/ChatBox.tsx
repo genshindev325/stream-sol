@@ -1,7 +1,7 @@
-import { useDataMessage, useLocalPeer } from '@huddle01/react/hooks';
-import { useState } from 'react';
-import LocalMessageBubble from './LocalMessageBubble';
-import RemoteMessageBubble from './RemoteMessageBubble';
+import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
+import { useState } from "react";
+import LocalMessageBubble from "./LocalMessageBubble";
+import RemoteMessageBubble from "./RemoteMessageBubble";
 
 export type TMessage = {
   text: string;
@@ -10,12 +10,12 @@ export type TMessage = {
 
 function ChatBox() {
   const [messages, setMessages] = useState<TMessage[]>([]);
-  const [text, setText] = useState<string>('');
+  const [text, setText] = useState<string>("");
 
   const { peerId } = useLocalPeer();
   const { sendData } = useDataMessage({
     onMessage: (payload, from, label) => {
-      if (label === 'chat') {
+      if (label === "chat") {
         setMessages((prev) => [...prev, { text: payload, sender: from }]);
       }
     },
@@ -23,15 +23,15 @@ function ChatBox() {
 
   const sendMessage = () => {
     sendData({
-      to: '*',
+      to: "*",
       payload: text,
-      label: 'chat',
+      label: "chat",
     });
-    setText('');
+    setText("");
   };
 
   return (
-    <div className="w-1/4 border-2 border-white-400 flex flex-col">
+    <div className="lg:w-[400px] border-2 border-white-400 flex flex-col">
       <h1 className="text-center text-2xl my-2 border-b border-white-400">
         Chat Room
       </h1>
@@ -52,7 +52,7 @@ function ChatBox() {
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
+            if (event.key === "Enter") {
               sendMessage();
             }
           }}

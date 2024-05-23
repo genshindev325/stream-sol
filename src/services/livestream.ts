@@ -8,17 +8,19 @@ export const createLivestream = async ({
   text,
   link,
   thumbnail,
+  roomId,
 }: {
   title: string;
   description: string;
   text: string;
   link: string;
   thumbnail: string;
+  roomId: string;
 }) => {
   const token = getAccessToken();
   const { data } = await axios.post(
     `${API_CONFIG}/livestream`,
-    { title, description, text, link, view: 0, thumbnail },
+    { title, description, text, link, view: 0, thumbnail, roomId },
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -26,5 +28,10 @@ export const createLivestream = async ({
     }
   );
   console.log("Data: ", data);
+  return data;
+};
+
+export const getLivestreamByRoomId = async (roomId: string) => {
+  const { data } = await axios.get(`${API_CONFIG}/livestream?roomId=${roomId}`);
   return data;
 };

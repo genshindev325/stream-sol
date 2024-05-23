@@ -1,6 +1,6 @@
-import { TPeerMetadata } from '@/utils/types';
-import { useRemotePeer } from '@huddle01/react/hooks';
-import { TMessage } from './ChatBox';
+import { TPeerMetadata } from "@/libs/types";
+import { useRemotePeer } from "@huddle01/react/hooks";
+import { TMessage } from "./ChatBox";
 
 interface Props {
   message: TMessage;

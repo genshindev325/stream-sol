@@ -31,3 +31,14 @@ export type Announcement = {
 export type TPeerMetadata = {
   displayName: string;
 };
+
+export type Livestream = {
+  title: string;
+  description?: string;
+  thumbnail: string;
+  text: string;
+  link: string;
+  views: number;
+  creator: string;
+  roomId: string;
+};
