@@ -31,11 +31,11 @@ function ChatBox() {
   };
 
   return (
-    <div className="w-1/3 border-2 border-blue-400 rounded-lg flex flex-col">
-      <h1 className="text-center text-2xl my-2 border-b border-blue-400">
+    <div className="w-1/4 border-2 border-white-400 flex flex-col">
+      <h1 className="text-center text-2xl my-2 border-b border-white-400">
         Chat Room
       </h1>
-      <div className="flex-1 p-4 border-b border-blue-400">
+      <div className="flex-1 p-4 border-b border-white-400">
         {messages.map((message, index) =>
           message.sender === peerId ? (
             <LocalMessageBubble key={index} message={message} />
