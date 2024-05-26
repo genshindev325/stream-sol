@@ -2,14 +2,19 @@
 
 import { redirect } from "next/navigation";
 import LiveStreamPage from "@/components/stream/LiveStreamPage";
+import { getRoomAccessToken } from "@/services/room";
+import { getLivestreamByRoomId } from "@/services/livestream";
 
 type Props = {
   params: { roomId: string };
 };
 
 export default async function Livestream({ params }: Props) {
+  const roomId = params.roomId;
+
   try {
-    return <LiveStreamPage />;
+    const { livestream } = await getLivestreamByRoomId(roomId);
+    return <LiveStreamPage livestreamData={livestream} />;
   } catch (err) {
     redirect("/not-found");
   }

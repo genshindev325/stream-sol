@@ -30,38 +30,31 @@ import { getRoomAccessToken } from "@/services/room";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function LiveStreamPage() {
-  const [token, setToken] = useState("");
+type Props = {
+  livestreamData: Livestream;
+};
+
+export default function LiveStreamPage({ livestreamData }: Props) {
+  console.log(livestreamData);
   const [displayName, setDisplayName] = useState<string>("");
+  const [token, setToken] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenRef = useRef<HTMLVideoElement>(null);
   const params = useParams<{ roomId: string }>();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const { user } = useAuthContext();
-  const [livestreamData, setLivestreamData] = useState<Livestream>();
   const [joining, setJoining] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      const roomAccessToken = await getRoomAccessToken({
-        roomId: params.roomId,
-        publicKey: user?.publickey!,
-      });
-      console.log("Access Token is ", roomAccessToken);
-      setToken(roomAccessToken);
+      const roomId = params.roomId;
+      const publicKey = user?.publickey!;
+      const token = await getRoomAccessToken({ roomId, publicKey });
+      setToken(token);
     };
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getLivestreamByRoomId(params.roomId);
-      setLivestreamData(data.livestream);
-    };
-
-    fetchData();
-  }, [params]);
 
   const { joinRoom, state } = useRoom({
     onJoin: (room) => {

@@ -144,6 +144,7 @@ export default function UploadVideo() {
         roomId,
       });
       console.log(">>>>>>", livestream);
+      console.log(roomId);
       router.push(`/livestream/${roomId}`);
     } catch (err) {
       toast.error("Failed to create a livestream", { duration: 3000 });
