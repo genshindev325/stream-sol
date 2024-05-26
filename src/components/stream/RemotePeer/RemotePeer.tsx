@@ -20,7 +20,7 @@ const RemotePeer = ({ peerId }: Props) => {
   const screenAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    console.log('stream', stream);
+    console.log('stream', stream, state);
     if (stream && vidRef.current && state === 'playable') {
       vidRef.current.srcObject = stream;
 
@@ -55,24 +55,6 @@ const RemotePeer = ({ peerId }: Props) => {
       };
     }
   }, [audioStream]);
-
-  useEffect(() => {
-    if (screenVideo && screenVideoRef.current) {
-      screenVideoRef.current.srcObject = screenVideo;
-
-      screenVideoRef.current.onloadedmetadata = async () => {
-        try {
-          screenVideoRef.current?.play();
-        } catch (error) {
-          console.error(error);
-        }
-      };
-
-      screenVideoRef.current.onerror = () => {
-        console.error('videoCard() | Error is hapenning...');
-      };
-    }
-  }, [screenVideo]);
 
   useEffect(() => {
     if (screenAudio && screenAudioRef.current) {

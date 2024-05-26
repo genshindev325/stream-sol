@@ -8,13 +8,14 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const roomId = searchParams.get("roomId");
+  const publicKey = searchParams.get("publicKey");
 
   if (!roomId) {
     return new Response("Missing roomId", { status: 400 });
   }
 
   const accessToken = new AccessToken({
-    apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY || "",
+    apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
     roomId: roomId as string,
     role: Role.HOST,
     permissions: {
@@ -29,6 +30,12 @@ export async function GET(request: Request) {
       canRecvData: true,
       canSendData: true,
       canUpdateMetadata: true,
+    },
+    options: {
+      metadata: {
+        // you can add any custom attributes here which you want to associate with the user
+        walletAddress: publicKey,
+      },
     },
   });
 

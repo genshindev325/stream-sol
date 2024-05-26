@@ -11,8 +11,8 @@ function RemoteMessageBubble({ message }: Props) {
 
   return (
     <div className="items-start flex flex-col">
-      <span className="text-white bg-gray-500">{metadata?.displayName}</span>
-      <span className="text-white text-sm">{message.text}</span>
+      <span className="text-white bg-gray-900">{metadata?.displayName}</span>
+      <span className="text-gray-500 text-sm">{message.text}</span>
     </div>
   );
 }

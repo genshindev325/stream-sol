@@ -39,6 +39,6 @@ export type Livestream = {
   text: string;
   link: string;
   views: number;
-  creator: string;
+  creator: User;
   roomId: string;
 };

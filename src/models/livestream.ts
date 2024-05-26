@@ -4,6 +4,7 @@ import MongooseDelete, {
   SoftDeleteDocument,
   SoftDeleteModel,
 } from "mongoose-delete";
+import { IUser, UserSchema } from "./user";
 
 export interface ILivestream extends SoftDeleteDocument {
   title: string;
@@ -12,7 +13,7 @@ export interface ILivestream extends SoftDeleteDocument {
   text: string;
   link: string;
   views: number;
-  creator: string;
+  creator: IUser;
   roomId: string;
 }
 
@@ -63,7 +64,7 @@ export const LivestreamSchema = new Schema<ILivestream>(
 
     /// Creator
     creator: {
-      type: String,
+      type: UserSchema,
       required: true,
     },
 
@@ -78,13 +79,6 @@ export const LivestreamSchema = new Schema<ILivestream>(
     toJSON: {
       versionKey: false,
       virtuals: true,
-      transform: (_, ret) => {
-        ret.id = ret._id.toString();
-        delete ret._id;
-      },
-    },
-    toObject: {
-      versionKey: false,
       transform: (_, ret) => {
         ret.id = ret._id.toString();
         delete ret._id;

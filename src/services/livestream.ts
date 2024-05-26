@@ -35,3 +35,8 @@ export const getLivestreamByRoomId = async (roomId: string) => {
   const { data } = await axios.get(`${API_CONFIG}/livestream?roomId=${roomId}`);
   return data;
 };
+
+export const getAllLivestreams = async (page: string, search: string) => {
+  const {data} = await axios.get(`${API_CONFIG}/livestream/all?page=${page}&&search=${search}`);
+  return data;
+}

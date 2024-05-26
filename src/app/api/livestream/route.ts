@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import connectMongo from "@/libs/connect-mongo";
 import LivestreamModel from "@/models/livestream";
 import { HttpStatusCode } from "axios";
+import UserModel, { IUser } from "@/models/user";
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
@@ -9,12 +10,15 @@ export async function POST(request: Request) {
 
   await connectMongo();
 
+  const creator = await UserModel.findOne({
+    publickey: userPk,
+  });
   const livestream = new LivestreamModel({
-    creator: userPk,
+    creator,
     ...livestreamData,
   });
 
-  console.log("MongoDB", livestreamData);
+  console.log("MongoDB", livestream);
 
   try {
     await livestream.save();

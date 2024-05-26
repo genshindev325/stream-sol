@@ -14,25 +14,49 @@ import {
 import { Inter } from "next/font/google";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { getLivestreamByRoomId } from "@/services/livestream";
+import AvatarComponent from "../common/AvatarComponent";
+import { FaDollarSign, FaStop } from "react-icons/fa";
+import {
+  AiFillCamera,
+  AiOutlineAudio,
+  AiOutlineAudioMuted,
+  AiOutlineCamera,
+} from "react-icons/ai";
+import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
+import { HiMiniPlayPause } from "react-icons/hi2";
+import { getRoomAccessToken } from "@/services/room";
 
 const inter = Inter({ subsets: ["latin"] });
 
-type Props = {
-  token: string;
-};
-
-export default function Home({ token }: Props) {
+export default function LiveStreamPage() {
+  const [token, setToken] = useState("");
   const [displayName, setDisplayName] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenRef = useRef<HTMLVideoElement>(null);
   const params = useParams<{ roomId: string }>();
   const [isRecording, setIsRecording] = useState<boolean>(false);
+  const { user } = useAuthContext();
   const [livestreamData, setLivestreamData] = useState<Livestream>();
+  const [joining, setJoining] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const roomAccessToken = await getRoomAccessToken({
+        roomId: params.roomId,
+        publicKey: user?.publickey!,
+      });
+      console.log("Access Token is ", roomAccessToken);
+      setToken(roomAccessToken);
+    };
+
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       const data = await getLivestreamByRoomId(params.roomId);
-      console.log(">>>>>", data);
       setLivestreamData(data.livestream);
     };
 
@@ -48,12 +72,15 @@ export default function Home({ token }: Props) {
       console.log("onPeerJoin", peer);
     },
   });
+  console.log("State: ", state);
   const { enableVideo, isVideoOn, stream, disableVideo } = useLocalVideo();
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare();
   const { updateMetadata } = useLocalPeer<TPeerMetadata>();
   const { peerIds } = usePeerIds();
+
+  console.log(peerIds);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -68,153 +95,192 @@ export default function Home({ token }: Props) {
   }, [shareStream]);
 
   return (
-    <main className={`flex flex-col items-center ${inter.className}`}>
-      <div className="w-full flex justify-between items-stretch">
-        <div className="flex-1 justify-between items-center flex flex-col m-[10px]">
-          {shareStream && (
-            <div className="mx-auto relative">
-              <video
-                ref={screenRef}
-                className="aspect-video rounded-xl lg:w-[800px]"
-                autoPlay
-                muted
-              />
-              {isVideoOn && (
-                <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
+    <>
+      {state === "idle" ? (
+        <>
+          <div className="flex justify-center min-h-[95vh]">
+            <button
+              disabled={user ? false : true}
+              type="button"
+              className="bg-blue-500 p-2 mx-2 rounded-lg h-[40px] my-auto"
+              onClick={async () => {
+                setDisplayName(user?.username || "");
+                setJoining(true);
+                console.log(user?.username, params.roomId, token);
+                await joinRoom({
+                  roomId: params.roomId as string,
+                  token,
+                });
+                setJoining(false);
+              }}
+            >
+              {joining ? "Joining..." : "Join Room"}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
+          <div className="flex max-xl:flex-col gap-[16px] mx-auto mb-[32px] sm:mb-[48px]">
+            <div className="flex flex-col grow gap-[16px] m-[10px]">
+              <div className="mx-auto relative">
+                {shareStream ? (
                   <video
-                    ref={videoRef}
-                    className="aspect-video rounded-xl"
+                    ref={screenRef}
+                    className="aspect-video rounded-xl lg:w-[800px]"
                     autoPlay
                     muted
                   />
-                </div>
-              )}
-            </div>
-          )}
-          <div className="z-10 m-5 max-w-20xl w-full items-center justify-center font-mono text-[1.5rem] lg:flex">
-            {/* <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-                <code className="font-mono font-bold">{state}</code>
-              </p> */}
-            <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-              {state === "idle" && (
-                <>
-                  <input
-                    disabled={state !== "idle"}
-                    placeholder="Display Name"
-                    type="text"
-                    className="border-2 border-blue-400 rounded-lg p-2  mx-2 bg-black text-white"
-                    value={displayName}
-                    onChange={(event) => setDisplayName(event.target.value)}
+                ) : (
+                  <video
+                    ref={screenRef}
+                    className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500"
+                    autoPlay
+                    muted
                   />
+                )}
 
-                  <button
-                    disabled={!displayName}
-                    type="button"
-                    className="bg-blue-500 p-2 mx-2 rounded-lg"
-                    onClick={async () => {
-                      console.log(params.roomId, token);
-                      await joinRoom({
-                        roomId: params.roomId as string,
-                        token,
-                      });
-                    }}
-                  >
-                    Join Room
-                  </button>
-                </>
-              )}
+                <div className="mt-8 mb-32 grid gap-2 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+                  {peerIds.map((peerId) =>
+                    peerId ? <RemotePeer key={peerId} peerId={peerId} /> : null
+                  )}
+                </div>
 
-              {state === "connected" && (
-                <>
-                  <button
-                    type="button"
-                    className="bg-blue-500 p-2 mx-2 rounded-lg"
-                    onClick={async () => {
-                      isVideoOn ? await disableVideo() : await enableVideo();
-                    }}
-                  >
-                    {isVideoOn ? <AiFillCamera /> : <AiOutlineCamera />}
-                  </button>
-                  <button
-                    type="button"
-                    className="bg-blue-500 p-2 mx-2 rounded-lg"
-                    onClick={async () => {
-                      isAudioOn ? await disableAudio() : await enableAudio();
-                    }}
-                  >
-                    {isAudioOn ? <AiOutlineAudioMuted /> : <AiOutlineAudio />}
-                  </button>
-                  <button
-                    type="button"
-                    className="bg-blue-500 p-2 mx-2 rounded-lg"
-                    onClick={async () => {
-                      shareStream
-                        ? await stopScreenShare()
-                        : await startScreenShare();
-                    }}
-                  >
-                    {shareStream ? <LuScreenShareOff /> : <LuScreenShare />}
-                  </button>
-                  <button
-                    type="button"
-                    className="bg-blue-500 p-2 mx-2 rounded-lg"
-                    onClick={async () => {
-                      const status = isRecording
-                        ? await fetch(
-                            `/api/stopRecording?roomId=${params.roomId}`
-                          )
-                        : await fetch(
-                            `/api/startRecording?roomId=${params.roomId}`
-                          );
+                {isVideoOn && (
+                  <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
+                    <video
+                      ref={videoRef}
+                      className="aspect-video rounded-xl"
+                      autoPlay
+                      muted
+                    />
+                  </div>
+                )}
+              </div>
 
-                      const data = await status.json();
-                      console.log({ data });
-                      setIsRecording(!isRecording);
-                    }}
-                  >
-                    {isRecording ? <FaStop /> : <HiMiniPlayPause />}
-                  </button>
-                </>
-              )}
+              <div className="z-10 max-w-20xl w-full items-center justify-center font-mono text-[1.5rem] lg:flex">
+                {/* <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+              <code className="font-mono font-bold">{state}</code>
+            </p> */}
+                <div className="flex justify-center">
+                  {state === "connected" && (
+                    <>
+                      <button
+                        type="button"
+                        className="bg-blue-500 p-2 mx-2 rounded-lg"
+                        onClick={async () => {
+                          isVideoOn
+                            ? await disableVideo()
+                            : await enableVideo();
+                        }}
+                      >
+                        {isVideoOn ? <AiFillCamera /> : <AiOutlineCamera />}
+                      </button>
+                      <button
+                        type="button"
+                        className="bg-blue-500 p-2 mx-2 rounded-lg"
+                        onClick={async () => {
+                          isAudioOn
+                            ? await disableAudio()
+                            : await enableAudio();
+                        }}
+                      >
+                        {isAudioOn ? (
+                          <AiOutlineAudio />
+                        ) : (
+                          <AiOutlineAudioMuted />
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="bg-blue-500 p-2 mx-2 rounded-lg"
+                        onClick={async () => {
+                          shareStream
+                            ? await stopScreenShare()
+                            : await startScreenShare();
+                        }}
+                      >
+                        {shareStream ? <LuScreenShareOff /> : <LuScreenShare />}
+                      </button>
+                      <button
+                        type="button"
+                        className="bg-blue-500 p-2 mx-2 rounded-lg"
+                        onClick={async () => {
+                          const status = isRecording
+                            ? await fetch(
+                                `/api/stopRecording?roomId=${params.roomId}`
+                              )
+                            : await fetch(
+                                `/api/startRecording?roomId=${params.roomId}`
+                              );
+
+                          const data = await status.json();
+                          console.log({ data });
+                          setIsRecording(!isRecording);
+                        }}
+                      >
+                        {isRecording ? <FaStop /> : <HiMiniPlayPause />}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="text-[1.25rem] sm:text-[1.5rem] break- font-semibold">
+                {livestreamData?.title}
+              </div>
+              <div className="flex flex-col lg:flex-row justify-between gap-4 mt-4">
+                {/* <div className="flex flex-col justify-between sm:flex-row gap-2 sm:gap-4"> */}
+                <div className="flex gap-2 hover:cursor-pointer">
+                  <AvatarComponent
+                    avatar={livestreamData?.creator?.avatar}
+                    size={44}
+                  />
+                  <div className="flex flex-col">
+                    <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
+                      {livestreamData?.creator?.username}
+                    </div>
+                    <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light">
+                      <a href={livestreamData?.link} target="_blank">
+                        {livestreamData?.text}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-[120px] xl:w-[140px] h-[36px] xl:h-[44px] text-[0.875rem] lg:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-semibold bg-primary-300 ">
+                    Follow
+                  </div>
+                  <div className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] sm:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold">
+                    <FaDollarSign />
+                    Donate
+                  </div>
+                </div>
+                {/* </div> */}
+              </div>
+              <div className="text-grey-300 bg-[#FFFFFF05] p-4 border border-grey-800 rounded-lg mt-4">
+                {livestreamData?.description ? (
+                  <>
+                    <div className="text-[1.25rem] sm:text-[1.5rem] break- font-semibold">
+                      Description
+                    </div>
+                    {livestreamData?.description}
+                  </>
+                ) : (
+                  "No description"
+                )}
+              </div>
+
+              {/* <div className="mt-8 mb-32 grid gap-2 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+          {peerIds.map((peerId) =>
+            peerId ? <RemotePeer key={peerId} peerId={peerId} /> : null
+          )}
+        </div> */}
             </div>
-          </div>
 
-          <div className="">{livestreamData?.title}</div>
-
-          <div className="mt-8 mb-32 grid gap-2 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-            {peerIds.map((peerId) =>
-              peerId ? <RemotePeer key={peerId} peerId={peerId} /> : null
-            )}
+            {state === "connected" && <ChatBox />}
           </div>
         </div>
-
-        {state === "connected" && <ChatBox />}
-      </div>
-    </main>
+      )}
+    </>
   );
 }
-
-import { GetServerSidePropsContext } from "next";
-import { getRoomAccessToken } from "@/services/room";
-import {
-  AiFillCamera,
-  AiOutlineAudio,
-  AiOutlineAudioMuted,
-  AiOutlineCamera,
-  AiOutlineVideoCamera,
-} from "react-icons/ai";
-import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
-import { HiMiniPlayPause } from "react-icons/hi2";
-import { FaStop } from "react-icons/fa";
-import { getLivestreamByRoomId } from "@/services/livestream";
-
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  const roomId = ctx.params?.roomId?.toString() || "";
-  const roomAccessToken = await getRoomAccessToken({ roomId });
-
-  const token = await roomAccessToken.toJwt();
-
-  return {
-    props: { token },
-  };
-};

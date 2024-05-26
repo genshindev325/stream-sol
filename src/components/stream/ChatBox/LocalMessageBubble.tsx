@@ -11,7 +11,7 @@ function LocalMessageBubble({ message }: Props) {
 
   return (
     <div className="w-full items-end flex flex-col bg-black rounded-lg">
-      <span className="text-white text-sm">{message.text}</span>
+      <span className="text-gray-400 text-sm">{message.text}</span>
     </div>
   );
 }

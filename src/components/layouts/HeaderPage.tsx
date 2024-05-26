@@ -257,7 +257,7 @@ export default function HeaderPage({
                 <div
                   className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
                   onClick={() => {
-                    router.push(`profile/${user.username}`);
+                    router.push(`/profile/${user.username}`);
                   }}
                 >
                   <BsCameraVideo size={18} />
