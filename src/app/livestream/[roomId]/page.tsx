@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import LiveStreamPage from "@/components/stream/LiveStreamPage";
 import { getRoomAccessToken } from "@/services/room";
-import { getLivestreamByRoomId } from "@/services/livestream";
+import { getLivestreamByRoomId, startRecording } from "@/services/livestream";
 
 type Props = {
   params: { roomId: string };

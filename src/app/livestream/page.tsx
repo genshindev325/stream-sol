@@ -16,27 +16,8 @@ import { FullLoading, NoWallet } from "@/components/common";
 import uploadPic from "@/assets/svgs/upload.svg";
 
 /// Livestream service
-import { createLivestream } from "@/services/livestream";
+import { createLivestream, createRoom } from "@/services/livestream";
 import { getRoomAccessToken } from "@/services/room";
-
-const createHuddleRoom = async (title: string) => {
-  const response = await fetch("https://api.huddle01.com/api/v1/create-room", {
-    method: "POST",
-    body: JSON.stringify({
-      title,
-    }),
-    headers: {
-      "Content-type": "application/json",
-      "x-api-key": process.env.NEXT_PUBLIC_HUDDLE_API_KEY || "",
-    },
-  });
-
-  const data = await response.json();
-
-  const roomId = data.data.roomId;
-
-  return roomId;
-};
 
 export default function UploadVideo() {
   const [title, setTitle] = useState("");
@@ -110,7 +91,7 @@ export default function UploadVideo() {
 
     setLoading(true);
     try {
-      const roomId = await createHuddleRoom(title);
+      const { roomId } = await createRoom({ title });
 
       const options = JSON.stringify({
         cidVersion: 1,

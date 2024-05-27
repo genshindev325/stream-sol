@@ -15,9 +15,13 @@ import { Inter } from "next/font/google";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { getLivestreamByRoomId } from "@/services/livestream";
+import {
+  getLivestreamByRoomId,
+  startRecording,
+  stopRecording,
+} from "@/services/livestream";
 import AvatarComponent from "../common/AvatarComponent";
-import { FaDollarSign, FaStop } from "react-icons/fa";
+import { FaDollarSign, FaStop, FaWindowClose } from "react-icons/fa";
 import {
   AiFillCamera,
   AiOutlineAudio,
@@ -27,6 +31,8 @@ import {
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
 import { HiMiniPlayPause } from "react-icons/hi2";
 import { getRoomAccessToken } from "@/services/room";
+import { BsSignStop } from "react-icons/bs";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,7 +41,6 @@ type Props = {
 };
 
 export default function LiveStreamPage({ livestreamData }: Props) {
-  console.log(livestreamData);
   const [displayName, setDisplayName] = useState<string>("");
   const [token, setToken] = useState<string>("");
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -43,22 +48,12 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const params = useParams<{ roomId: string }>();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const { user } = useAuthContext();
+  const { publicKey: walletKey } = useWallet();
   const [joining, setJoining] = useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const roomId = params.roomId;
-      const publicKey = user?.publickey!;
-      const token = await getRoomAccessToken({ roomId, publicKey });
-      setToken(token);
-    };
-
-    fetchData();
-  }, []);
-
   const { joinRoom, state } = useRoom({
     onJoin: (room) => {
       console.log("onJoin", room);
+      console.log(peerId, role);
       updateMetadata({ displayName });
     },
     onPeerJoin: (peer) => {
@@ -70,10 +65,8 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare();
-  const { updateMetadata } = useLocalPeer<TPeerMetadata>();
+  const { peerId, role, updateMetadata } = useLocalPeer<TPeerMetadata>();
   const { peerIds } = usePeerIds();
-
-  console.log(peerIds);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -87,6 +80,31 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     }
   }, [shareStream]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const roomId = params.roomId;
+      const publicKey = user?.publickey! || walletKey?.toBase58()!;
+      console.log(publicKey);
+      const token = await getRoomAccessToken({ roomId, publicKey });
+      setToken(token);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const roomId = params.roomId;
+      if (!isRecording && state == "connected" && role == "host") {
+        const status = await startRecording(roomId);
+        console.log(roomId, status);
+        setIsRecording(true);
+      }
+    };
+
+    fetchData();
+  }, [state]);
+
   return (
     <>
       {state === "idle" ? (
@@ -97,14 +115,18 @@ export default function LiveStreamPage({ livestreamData }: Props) {
               type="button"
               className="bg-blue-500 p-2 mx-2 rounded-lg h-[40px] my-auto"
               onClick={async () => {
-                setDisplayName(user?.username || "");
-                setJoining(true);
-                console.log(user?.username, params.roomId, token);
-                await joinRoom({
-                  roomId: params.roomId as string,
-                  token,
-                });
-                setJoining(false);
+                try {
+                  setDisplayName(user?.username || "");
+                  setJoining(true);
+                  console.log(user?.username, params.roomId, token);
+                  await joinRoom({
+                    roomId: params.roomId as string,
+                    token,
+                  });
+                  setJoining(false);
+                } catch (error) {
+                  setJoining(false);
+                }
               }}
             >
               {joining ? "Joining..." : "Join Room"}
@@ -196,22 +218,18 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                       </button>
                       <button
                         type="button"
-                        className="bg-blue-500 p-2 mx-2 rounded-lg"
+                        className="bg-red-500 p-2 mx-2 rounded-lg"
                         onClick={async () => {
-                          const status = isRecording
-                            ? await fetch(
-                                `/api/stopRecording?roomId=${params.roomId}`
-                              )
-                            : await fetch(
-                                `/api/startRecording?roomId=${params.roomId}`
-                              );
-
-                          const data = await status.json();
-                          console.log({ data });
-                          setIsRecording(!isRecording);
+                          console.log(isRecording);
+                          if (isRecording) {
+                            const status = await stopRecording(params.roomId);
+                            console.log(params.roomId, status);
+                            const data = await status.data;
+                            console.log(params.roomId, " Data: ", data);
+                          }
                         }}
                       >
-                        {isRecording ? <FaStop /> : <HiMiniPlayPause />}
+                        <FaWindowClose />
                       </button>
                     </>
                   )}

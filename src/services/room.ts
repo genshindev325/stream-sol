@@ -1,6 +1,5 @@
 import axios from "axios";
 import { API_CONFIG } from "../libs/constants";
-import { getAccessToken } from "@/libs/helpers";
 
 export const getRoomAccessToken = async ({
   roomId,
