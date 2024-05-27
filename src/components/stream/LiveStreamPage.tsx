@@ -65,7 +65,8 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio();
   const { startScreenShare, stopScreenShare, shareStream } =
     useLocalScreenShare();
-  const { peerId, role, updateMetadata } = useLocalPeer<TPeerMetadata>();
+  const { peerId, role, updateMetadata, metadata } =
+    useLocalPeer<TPeerMetadata>();
   const { peerIds } = usePeerIds();
 
   useEffect(() => {
@@ -226,6 +227,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                             console.log(params.roomId, status);
                             const data = await status.data;
                             console.log(params.roomId, " Data: ", data);
+                            console.log("Metadata: ", metadata, peerId);
                           }
                         }}
                       >

@@ -39,6 +39,12 @@ export async function GET(request: NextRequest) {
         canSendData: true,
         canUpdateMetadata: true,
       },
+      options: {
+        metadata: {
+          // you can add any custom attributes here which you want to associate with the user
+          botId: Date.now(),
+        },
+      },
     });
 
     const accessToken = await token.toJwt();

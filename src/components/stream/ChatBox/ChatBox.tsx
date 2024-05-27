@@ -1,9 +1,15 @@
 import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LocalMessageBubble from "./LocalMessageBubble";
 import RemoteMessageBubble from "./RemoteMessageBubble";
-import { IoSend } from "react-icons/io5";
 import { RiSendPlaneFill } from "react-icons/ri";
+import emojiData from "@emoji-mart/data";
+import EmojiPicker from "@emoji-mart/react";
+import { BsEmojiSmile } from "react-icons/bs";
+import { useParams } from "next/navigation";
+import { TPeerMetadata } from "@/libs/types";
+import { creatChat, getChatHistory } from "@/services/chat";
+import { getLivestreamByRoomId } from "@/services/livestream";
 
 export type TMessage = {
   text: string;
@@ -13,15 +19,56 @@ export type TMessage = {
 function ChatBox() {
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [text, setText] = useState<string>("");
+  const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
+  const params = useParams<{ roomId: string }>();
+  const { metadata } = useLocalPeer<TPeerMetadata>();
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { peerId } = useLocalPeer();
   const { sendData } = useDataMessage({
-    onMessage: (payload, from, label) => {
+    onMessage: async (payload, from, label) => {
       if (label === "chat") {
         setMessages((prev) => [...prev, { text: payload, sender: from }]);
+        const roomId = params.roomId;
+        console.log(">>", roomId, from, payload);
+        const chat = await creatChat({
+          roomId,
+          sender: from,
+          content: payload,
+        });
+        console.log("Messages: ", messages);
       }
     },
   });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { livestream } = await getLivestreamByRoomId(params.roomId);
+      const livestreamId = livestream.id;
+      console.log(livestreamId);
+      const { chatHistory } = await getChatHistory({ livestreamId });
+
+      let allMessages = [];
+      if (chatHistory) {
+        allMessages = chatHistory.map((item: any) => {
+          return {
+            text: item?.content,
+            sender: item?.sender,
+          };
+        });
+      }
+      setMessages(allMessages);
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
 
   const sendMessage = () => {
     sendData({
@@ -33,11 +80,14 @@ function ChatBox() {
   };
 
   return (
-    <div className="w-full xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px]">
+    <div className="relative w-full xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh]">
       <h1 className="text-center text-2xl my-2 border-b border-grey-800">
         Chat Room
       </h1>
-      <div className="flex-1 p-4 border-b border-grey-800">
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 p-4 border-b border-grey-800 overflow-y-scroll"
+      >
         {messages.map((message, index) =>
           message.sender === peerId ? (
             <LocalMessageBubble key={index} message={message} />
@@ -46,6 +96,21 @@ function ChatBox() {
           )
         )}
       </div>
+      {emojiPickerVisible && (
+        <div className={"absolute right-[0px] bottom-[50px] z-10"}>
+          <EmojiPicker
+            data={emojiData}
+            theme="dark"
+            onClickOutside={() => {
+              setEmojiPickerVisible(false);
+            }}
+            onEmojiSelect={(e: any) => {
+              setText(text + e.native);
+            }}
+          />
+        </div>
+      )}
+
       <div className="flex p-1">
         <input
           type="text"
@@ -59,6 +124,15 @@ function ChatBox() {
             }
           }}
         />
+        <button
+          className="m-1 justify-center"
+          onClick={() => {
+            setEmojiPickerVisible(!emojiPickerVisible);
+            console.log(emojiPickerVisible);
+          }}
+        >
+          <BsEmojiSmile size={"20px"} />
+        </button>
         <button
           className="m-1 justify-center"
           onClick={() => {

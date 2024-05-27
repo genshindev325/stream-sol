@@ -75,8 +75,8 @@ export default function Main() {
       ) : (
         <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
           <div className="flex flex-wrap justify-center md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
-            {lives.map((livestream) => {
-              return <Streamtile livestream={livestream} />;
+            {lives.map((livestream, idx) => {
+              return <Streamtile key={idx} livestream={livestream} />;
             })}
           </div>
           {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}

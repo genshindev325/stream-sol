@@ -57,6 +57,7 @@ export async function GET(request: Request) {
               metadata: {
                 // you can add any custom attributes here which you want to associate with the user
                 walletAddress: publicKey,
+                displayName: "",
               },
             },
           }
