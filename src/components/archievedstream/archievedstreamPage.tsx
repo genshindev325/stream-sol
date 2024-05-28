@@ -42,8 +42,7 @@ export default function ArchievedstreamPage({ archievedstreamData }: Props) {
               <video
                 src={archievedstreamData.video}
                 className="aspect-video rounded-xl lg:w-[800px]"
-                autoPlay
-                muted
+                controls
               />
             </div>
 
