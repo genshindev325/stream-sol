@@ -102,13 +102,13 @@ export const UserSchema = new Schema<IUser>(
         delete ret._id;
       },
     },
-    toObject: {
-      versionKey: false,
-      transform: (_, ret) => {
-        ret.id = ret._id.toString();
-        delete ret._id;
-      },
-    },
+    // toObject: {
+    //   versionKey: false,
+    //   transform: (_, ret) => {
+    //     ret.id = ret._id.toString();
+    //     delete ret._id;
+    //   },
+    // },
   }
 );
 

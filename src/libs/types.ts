@@ -27,3 +27,28 @@ export type Announcement = {
   userLiked: AlikeEnum;
   createdAt: string;
 };
+
+export type TPeerMetadata = {
+  displayName: string;
+};
+
+export type Livestream = {
+  title: string;
+  description?: string;
+  thumbnail: string;
+  text: string;
+  link: string;
+  views: number;
+  creator: User;
+  roomId: string;
+};
+
+export type Archievedstream = {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail: string;
+  creator: string;
+  roomId: string;
+  video: string;
+};

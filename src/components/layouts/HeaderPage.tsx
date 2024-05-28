@@ -163,7 +163,7 @@ export default function HeaderPage({
           </div>
         </div>
       )}
-      <div className="flex justify-between items-center sticky bg-background h-[64px] top-0 px-4 md:px-8 z-10 border-b border-1 border-solid border-[#FFFFFF0D] rounded-b-[40px]">
+      <div className="z-40 flex justify-between items-center sticky bg-background h-[64px] top-0 px-4 md:px-8 z-10 border-b border-1 border-solid border-[#FFFFFF0D] rounded-b-[40px]">
         <div className="hover:cursor-pointer md:hidden">
           <RxHamburgerMenu
             size={30}
@@ -257,7 +257,7 @@ export default function HeaderPage({
                 <div
                   className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
                   onClick={() => {
-                    router.push(`profile/${user.username}`);
+                    router.push(`/profile/${user.username}`);
                   }}
                 >
                   <BsCameraVideo size={18} />

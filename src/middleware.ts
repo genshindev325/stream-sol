@@ -40,7 +40,6 @@ export async function middleware(request: NextRequest) {
   if (request.method !== "GET") {
     try {
       const user = await authentiateToken(request);
-
       if (user) {
         const requestHeaders = new Headers(request.headers);
         requestHeaders.set("user", user);

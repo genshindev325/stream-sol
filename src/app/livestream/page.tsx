@@ -15,10 +15,15 @@ import { FullLoading, NoWallet } from "@/components/common";
 /// Images
 import uploadPic from "@/assets/svgs/upload.svg";
 
+/// Livestream service
+import { createLivestream, createRoom } from "@/services/livestream";
+import { getRoomAccessToken } from "@/services/room";
+
 export default function UploadVideo() {
   const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
+  const [link, setLink] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
@@ -43,30 +48,60 @@ export default function UploadVideo() {
     }
   };
 
-  const create = async () => {
-    if (!title) {
-      toast.error("Title can't be empty", { duration: 3000 });
-      return;
+  const validateForm = () => {
+    const regexTitle = /^[A-Za-z0-9]+$/;
+    const regexLink = /^[a-zA-Z0-9\-_:.\/?=&"{}()]+$/;
+
+    if (title == "" || !regexTitle.test(title)) {
+      toast.error("A stream title must be non-empty and valid", {
+        duration: 3000,
+      });
+      return false;
     }
 
-    if (category === "") {
-      toast.error("You must select category", { duration: 3000 });
-      return;
+    if (text == "" || !regexTitle.test(text)) {
+      toast.error("A stream text must be non-empty and valid", {
+        duration: 3000,
+      });
+      return false;
+    }
+
+    if (link == "" || !regexLink.test(link)) {
+      toast.error("A stream link must be non-empty and valid", {
+        duration: 3000,
+      });
+      return false;
     }
 
     if (thumbnailFile === null) {
-      toast.error("You must select thumbnail to upload", { duration: 3000 });
+      toast.error("Thumbnail image must be valid", {
+        duration: 3000,
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const create = async () => {
+    const isValid = validateForm();
+    if (!isValid) {
       return;
     }
 
     setLoading(true);
     try {
+      const { roomId } = await createRoom({ title });
+
       const options = JSON.stringify({
         cidVersion: 1,
       });
 
       const imageFormData = new FormData();
-      imageFormData.append("file", thumbnailFile);
+      if (thumbnailFile) {
+        // Perform a null check on thumbnailFile
+        imageFormData.append("file", thumbnailFile);
+      }
       imageFormData.append("pinataOptions", options);
       const resImage = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -78,9 +113,22 @@ export default function UploadVideo() {
         }
       );
 
+      const imageHashValue = resImage.data.IpfsHash;
+
       toast.success("Successfully uploaded", { duration: 3000 });
+      const livestream = await createLivestream({
+        title,
+        description,
+        text,
+        link,
+        thumbnail: imageHashValue,
+        roomId,
+      });
+      console.log(">>>>>>", livestream);
+      console.log(roomId);
+      router.push(`/livestream/${roomId}`);
     } catch (err) {
-      toast.error("Failed to upload", { duration: 3000 });
+      toast.error("Failed to create a livestream", { duration: 3000 });
       console.error(err);
     }
     setLoading(false);
@@ -183,9 +231,39 @@ export default function UploadVideo() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
-                Link*
+                Stream Text*
               </div>
-              
+              <div className="border border-grey-800 px-4 rounded-lg">
+                <input
+                  type="text"
+                  placeholder="Type here"
+                  value={text}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                  }}
+                  spellCheck={false}
+                  disabled={loading}
+                  className="text-white h-[48px] text-[0.875rem] sm:text-[1rem] placeholder:text-grey-700 bg-transparent border-none focus:outline-none focus:box-shadow:none w-full"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
+                Stream Link*
+              </div>
+              <div className="border border-grey-800 px-4 rounded-lg">
+                <input
+                  type="text"
+                  placeholder="Type here"
+                  value={link}
+                  onChange={(e) => {
+                    setLink(e.target.value);
+                  }}
+                  spellCheck={false}
+                  disabled={loading}
+                  className="text-white h-[48px] text-[0.875rem] sm:text-[1rem] placeholder:text-grey-700 bg-transparent border-none focus:outline-none focus:box-shadow:none w-full"
+                />{" "}
+              </div>
             </div>
             <div className="flex gap-[16px] border-t border-grey-800 pt-4">
               <div
