@@ -59,5 +59,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ recording }, { status: HttpStatusCode.Ok });
   } catch (error) {
     console.log(error);
+    return NextResponse.json({ recording: null }, { status: HttpStatusCode.BadRequest });
   }
 }
