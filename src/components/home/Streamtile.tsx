@@ -9,7 +9,7 @@ export default function Home({ livestream }: Props) {
   const router = useRouter();
   return (
     <div
-      className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]"
+      className="flex flex-col gap-[8px] w-[320px] sm:w-[240px hover:cursor-pointer"
       onClick={() => {
         router.push(`/livestream/${livestream.roomId}`);
       }}

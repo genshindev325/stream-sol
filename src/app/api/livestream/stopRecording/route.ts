@@ -11,7 +11,8 @@ interface Recordings {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    // const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const roomId = searchParams.get("roomId");
 
     if (
