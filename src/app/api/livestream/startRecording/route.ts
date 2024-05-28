@@ -5,7 +5,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
+    // const publicKey = searchParams.get("publicKey");
+    // const { searchParams } = new URL(request.url);
     const roomId = searchParams.get("roomId");
 
     if (
@@ -59,6 +61,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ recording }, { status: HttpStatusCode.Ok });
   } catch (error) {
     console.log(error);
-    return NextResponse.json({ recording: null }, { status: HttpStatusCode.BadRequest });
+    return NextResponse.json(
+      { recording: null },
+      { status: HttpStatusCode.BadRequest }
+    );
   }
 }

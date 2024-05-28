@@ -72,7 +72,7 @@ export default function Videos({ profile }: { profile: User }) {
                     className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]"
                   >
                     <div
-                      className="relative w-[320px] sm:w-[260px] h-[180px] sm:h-[170px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer"
+                      className="relative w-[320px] sm:w-[240px] h-[180px] sm:h-[135px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer"
                       onClick={() => {
                         //   alert(video.id);
                         const archievedstreamId = video.id;
