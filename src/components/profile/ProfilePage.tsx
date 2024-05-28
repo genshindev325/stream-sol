@@ -23,6 +23,7 @@ import { isFollower, follow } from "@/services/profile";
 /// Images
 import userPic from "@/assets/svgs/user.svg";
 import { User } from "@/libs/types";
+import Videos from "./Videos";
 
 type Props = {
   profile: User;
@@ -201,7 +202,7 @@ export default function ProfilePage({ profile }: Props) {
                 : " text-grey-500")
             }
             onClick={() => {
-              // selectTab("videos");
+              selectTab("videos");
             }}
           >
             Videos
@@ -238,7 +239,7 @@ export default function ProfilePage({ profile }: Props) {
         ) : tab === "announcements" ? (
           <Announcement profile={profile} />
         ) : (
-          <></>
+          <Videos profile={profile} />
         )}
       </div>
 

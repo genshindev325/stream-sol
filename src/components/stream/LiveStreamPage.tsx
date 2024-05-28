@@ -12,10 +12,11 @@ import {
   useRoom,
 } from "@huddle01/react/hooks";
 import { Inter } from "next/font/google";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import {
+  endLivestream,
   getLivestreamByRoomId,
   startRecording,
   stopRecording,
@@ -33,6 +34,8 @@ import { HiMiniPlayPause } from "react-icons/hi2";
 import { getRoomAccessToken } from "@/services/room";
 import { BsSignStop } from "react-icons/bs";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { createArchievedstream } from "@/services/archievedstream";
+import { IUser } from "@/models/user";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,7 +53,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const { user } = useAuthContext();
   const { publicKey: walletKey } = useWallet();
   const [joining, setJoining] = useState<boolean>(false);
-  const { joinRoom, state } = useRoom({
+  const router = useRouter();
+
+  const { joinRoom, state, closeRoom } = useRoom({
     onJoin: (room) => {
       console.log("onJoin", room);
       console.log(peerId, role);
@@ -221,13 +226,43 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                         type="button"
                         className="bg-red-500 p-2 mx-2 rounded-lg"
                         onClick={async () => {
-                          console.log(isRecording);
-                          if (isRecording) {
-                            const status = await stopRecording(params.roomId);
-                            console.log(params.roomId, status);
-                            const data = await status.data;
-                            console.log(params.roomId, " Data: ", data);
-                            console.log("Metadata: ", metadata, peerId);
+                          try {
+                            console.log(isRecording);
+                            if (isRecording) {
+                              const status = await stopRecording(params.roomId);
+                              console.log(params.roomId, status.data);
+                              const data = await status.data;
+
+                              if (data.recording.recordingUrl) {
+                                console.log(
+                                  params.roomId,
+                                  " Data: ",
+                                  data.recording.recordingUrl
+                                );
+                                await closeRoom();
+                                const archievedstream =
+                                  await createArchievedstream({
+                                    title: livestreamData.title,
+                                    description: livestreamData.description!,
+                                    thumbnail: livestreamData.thumbnail,
+                                    roomId: livestreamData.roomId,
+                                    creator: livestreamData.creator.publickey,
+                                    video: data.recording.recordingUrl,
+                                  });
+                                console.log(
+                                  "Archievedstream Data: ",
+                                  archievedstream
+                                );
+                                await endLivestream({
+                                  roomId: livestreamData.roomId,
+                                });
+                                router.push(
+                                  `/profile/${user?.username}?tab=videos`
+                                );
+                              }
+                            }
+                          } catch (error) {
+                            console.log(error);
                           }
                         }}
                       >
@@ -276,7 +311,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                     <div className="text-[1.25rem] sm:text-[1.5rem] break- font-semibold">
                       Description
                     </div>
-                    {livestreamData?.description}
+                    <div className="overflow-y-scroll">
+                      {livestreamData?.description}
+                    </div>
                   </>
                 ) : (
                   "No description"

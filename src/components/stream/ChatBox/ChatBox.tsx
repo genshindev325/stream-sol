@@ -80,13 +80,13 @@ function ChatBox() {
   };
 
   return (
-    <div className="relative w-full xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh]">
+    <div className="relative lg:w-[700px] md:w-[400px] xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh] ">
       <h1 className="text-center text-2xl my-2 border-b border-grey-800">
         Chat Room
       </h1>
       <div
         ref={messagesContainerRef}
-        className="flex-1 p-4 border-b border-grey-800 overflow-y-scroll"
+        className="flex-1 p-4 border-b border-grey-800 overflow-y-scroll break-all"
       >
         {messages.map((message, index) =>
           message.sender === peerId ? (

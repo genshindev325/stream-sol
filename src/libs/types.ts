@@ -42,3 +42,13 @@ export type Livestream = {
   creator: User;
   roomId: string;
 };
+
+export type Archievedstream = {
+  id: string;
+  title: string;
+  description?: string;
+  thumbnail: string;
+  creator: string;
+  roomId: string;
+  video: string;
+};
