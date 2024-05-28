@@ -1,12 +1,19 @@
 import { AvatarComponent } from "../common";
+import { useRouter } from "next/navigation";
 
 type Props = {
   livestream: any;
 };
 
 export default function Home({ livestream }: Props) {
+  const router = useRouter();
   return (
-    <div className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]">
+    <div
+      className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]"
+      onClick={() => {
+        router.push(`/livestream/${livestream.roomId}`);
+      }}
+    >
       <div className="relative w-[320px] sm:w-[240px] h-[180px] sm:h-[135px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer">
         <img
           src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${livestream?.thumbnail}`}
