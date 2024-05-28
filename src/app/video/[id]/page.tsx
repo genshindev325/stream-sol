@@ -5,11 +5,11 @@ import ArchievedstreamPage from "@/components/archievedstream/archievedstreamPag
 import { getArchievedstreamById } from "@/services/archievedstream";
 
 type Props = {
-  params: { archievedstreamId: string };
+  params: { id: string };
 };
 
 export default async function RecordingVideo({ params }: Props) {
-  const archievedstreamId = params.archievedstreamId;
+  const archievedstreamId = params.id;
   try {
     const { archievedstream } = await getArchievedstreamById({
       archievedstreamId,

@@ -89,7 +89,7 @@ export default function ProfilePage({ profile }: Props) {
   return (
     <div className="relative w-full h-full mb-[32px] sm:mb-[48px]">
       {loading && <FullLoading />}
-      <div className="mx-auto flex-1 sm:w-[360px] lg:w-[600px] xl:w-[960px] 2xl:w-[1200px]">
+      <div className="mx-[16px] sm:mx-auto flex-1 sm:w-[360px] lg:w-[600px] xl:w-[960px] 2xl:w-[1200px]">
         {profile?.banner ? (
           <img
             src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${profile?.banner}`}

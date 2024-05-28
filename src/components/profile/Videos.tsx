@@ -17,7 +17,7 @@ import { Archievedstream, User } from "@/libs/types";
 import { follow } from "@/services/profile";
 
 /// Images
-import videoPic from "@/assets/images/videos.png";
+import videoPic from "@/assets/images/video.png";
 import { fetchArchievedstreams } from "@/services/archievedstream";
 
 export default function Videos({ profile }: { profile: User }) {
@@ -71,21 +71,20 @@ export default function Videos({ profile }: { profile: User }) {
                     key={video.id}
                     className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]"
                   >
-                    <div className="relative w-[320px] sm:w-[260px] h-[180px] sm:h-[170px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer">
-                      <button
-                        onClick={() => {
-                          //   alert(video.id);
-                          const archievedstreamId = video.id;
-                          router.push(`/video/${archievedstreamId}`);
-                        }}
-                      >
-                        <img
-                          src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${video?.thumbnail}`}
-                          className="max-w-full max-h-full rounded-lg"
-                          crossOrigin="anonymous"
-                          alt="Avatar"
-                        />
-                      </button>
+                    <div
+                      className="relative w-[320px] sm:w-[260px] h-[180px] sm:h-[170px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer"
+                      onClick={() => {
+                        //   alert(video.id);
+                        const archievedstreamId = video.id;
+                        router.push(`/video/${archievedstreamId}`);
+                      }}
+                    >
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${video?.thumbnail}`}
+                        className="max-w-full max-h-full rounded-lg"
+                        crossOrigin="anonymous"
+                        alt="Avatar"
+                      />
                     </div>
                     <div className="relative px-2">
                       <div className="text-ellipsis line-clamp-2 font-bold text-[1rem] break-words mr-6">

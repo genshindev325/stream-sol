@@ -140,7 +140,7 @@ export default function HeaderPage({
     <>
       {loading && <FullLoading />}
       {signVisible && (
-        <div className="fixed top-0 left-0 w-full h-full bg-[#00000090] z-30">
+        <div className="fixed top-0 left-0 w-full h-full bg-background z-30">
           <div className="flex flex-col items-center gap-4 text-grey-300 w-[320px] modal-center bg-modal rounded-lg p-6">
             <MdClose
               size={24}
@@ -163,7 +163,7 @@ export default function HeaderPage({
           </div>
         </div>
       )}
-      <div className="z-40 flex justify-between items-center sticky bg-background h-[64px] top-0 px-4 md:px-8 z-10 border-b border-1 border-solid border-[#FFFFFF0D] rounded-b-[40px]">
+      <div className="z-40 flex justify-between items-center sticky bg-background h-[64px] top-0 px-4 md:px-8 border-b border-1 border-solid border-[#FFFFFF0D] rounded-b-[40px]">
         <div className="hover:cursor-pointer md:hidden">
           <RxHamburgerMenu
             size={30}
@@ -275,7 +275,7 @@ export default function HeaderPage({
                   Help
                 </div>
               </DropdownItem>
-              <DropdownItem>
+              {/* <DropdownItem>
                 <div
                   className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
                   onClick={() => {
@@ -285,7 +285,7 @@ export default function HeaderPage({
                   <MdOutlineFeedback size={20} />
                   Send Feedback
                 </div>
-              </DropdownItem>
+              </DropdownItem> */}
               <DropdownItem>
                 <div
                   className="flex gap-2 px-4 py-2 mx-4 items-center w-full rounded-lg hover:bg-[#FFFFFF0A]"
