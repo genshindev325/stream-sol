@@ -18,14 +18,13 @@ import { TbUserUp, TbUserDown } from "react-icons/tb";
 /// Custom
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { ADMIN_WALLETS, ITEMS_PER_PAGE } from "@/libs/constants";
+import { Livestream } from "@/libs/types";
+import { getAllLivestreams } from "@/services/livestream";
+import { AvatarComponent, LoadMore } from "../common";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
 import userPic from "@/assets/svgs/user.svg";
-import { Livestream } from "@/libs/types";
-import { useLivestreamsContext } from "@/contexts/LivestreamsContextProvider";
-import { getAllLivestreams } from "@/services/livestream";
-import { AvatarComponent, LoadMore } from "../common";
 
 export default function SiderPage({
   siderVisible,
@@ -38,15 +37,13 @@ export default function SiderPage({
   const pathname = usePathname();
   const router = useRouter();
   const selected = pathname.split("/")[1];
-  const [pageNum, setPageNum] = useState(1);
-  const [count, setCount] = useState(0);
+  const roomId = pathname.split("/")[2];
   const [streamPage, setStreamPage] = useState<boolean>(false);
-  const [loading, setLoading] = useState(false);
-  const { livestreams, setLivestreams } = useLivestreamsContext();
+  const [livestreams, setLivestreams] = useState<Array<Livestream>>([]);
 
   useEffect(() => {
-    const roomId = pathname.split("/")[2];
     if (selected == "livestream" && roomId) {
+      fetchVideos();
       setStreamPage(true);
     } else {
       setStreamPage(false);
@@ -54,32 +51,13 @@ export default function SiderPage({
   }, [pathname]);
 
   const fetchVideos = async () => {
-    setLoading(true);
     try {
-      const data = await getAllLivestreams(pageNum.toString(), "");
-      if (pageNum > 1) {
-        setLivestreams([...livestreams, ...data.livestreams]);
-      } else {
-        setLivestreams(data.livestreams);
-      }
-      setCount(data.count);
+      const data = await getAllLivestreams(1, "");
+      setLivestreams(data.livestreams);
     } catch (err) {
       console.error(err);
     }
-    setLoading(false);
   };
-
-  const showMore = () => {
-    const total = pageNum * ITEMS_PER_PAGE;
-
-    if (total < count) {
-      setPageNum(pageNum + 1);
-    }
-  };
-
-  useEffect(() => {
-    fetchVideos();
-  }, [pageNum]);
 
   return (
     <div
@@ -106,12 +84,17 @@ export default function SiderPage({
 
       {/* Home Sidebar */}
       {streamPage ? (
-        <div className="flex flex-col justify-normal gap-2 overflow-auto">
-          {livestreams?.map((livestream, idx) => {
+        <div className="flex flex-col gap-2 px-2">
+          {livestreams?.map((livestream: Livestream, idx) => {
             return (
               <div
                 key={idx}
-                className="flex items-center justify-center w-full gap-2 cursor-pointer"
+                className={
+                  "flex justify-between cursor-pointer px-4 py-2 rounded-lg " +
+                  (roomId === livestream.roomId
+                    ? "text-white bg-[#FFFFFF0A]"
+                    : "text-grey-400 hover:bg-[#FFFFFF0A]")
+                }
                 onClick={() => {
                   router.push(`/livestream/${livestream.roomId}`);
                 }}
@@ -119,29 +102,27 @@ export default function SiderPage({
                 <div className="flex gap-2">
                   <AvatarComponent
                     avatar={livestream.creator?.avatar}
-                    size={48}
+                    size={40}
                   />
                   <div className="flex flex-col md:w-[130px]">
-                    <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
-                      {livestream.creator?.username
-                        ? livestream.creator?.username
-                        : "No Username"}
+                    <div className="text-[1rem] text-grey-300">
+                      {livestream.creator.username}
                     </div>
-                    <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light truncate">
-                      {livestream.description || ""}
+                    <div className="text-[0.875rem] text-grey-500 font-light truncate">
+                      {livestream?.description!}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-[16px] h-[16px] rounded-full bg-green-500" />
-                    <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
-                      {livestream.views}
-                    </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  <div className="w-[16px] h-[16px] rounded-full bg-green-500" />
+                  <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
+                    {livestream.views}
                   </div>
                 </div>
               </div>
             );
           })}
-          {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
         </div>
       ) : (
         <>

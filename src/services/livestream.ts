@@ -31,7 +31,7 @@ export const createLivestream = async ({
 export const endLivestream = async ({ roomId }: { roomId: string }) => {
   const token = getAccessToken();
   const { data } = await axios.delete(
-    `${API_CONFIG}/livestream/end?roomId=${roomId}`,
+    `${API_CONFIG}/livestream?roomId=${roomId}`,
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -46,7 +46,7 @@ export const getLivestreamByRoomId = async (roomId: string) => {
   return data;
 };
 
-export const getAllLivestreams = async (page: string, search: string) => {
+export const getAllLivestreams = async (page: number, search: string) => {
   const { data } = await axios.get(
     `${API_CONFIG}/livestream/all?page=${page}&&search=${search}`
   );

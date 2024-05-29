@@ -7,10 +7,10 @@ import { LoadMore, PageLoading, NoComponent } from "@/components/common";
 import { getAllLivestreams } from "@/services/livestream";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import Streamtile from "@/components/home/Streamtile";
-import { useLivestreamsContext } from "@/contexts/LivestreamsContextProvider";
 
 /// Images
 import videoPic from "@/assets/images/video.png";
+import { Livestream } from "@/libs/types";
 
 export default function Main() {
   const [pageNum, setPageNum] = useState(1);
@@ -18,13 +18,12 @@ export default function Main() {
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
-  const { livestreams, setLivestreams } = useLivestreamsContext();
+  const [livestreams, setLivestreams] = useState<Array<Livestream>>([]);
 
   const fetchVideos = async () => {
     setLoading(true);
     try {
-      const data = await getAllLivestreams(pageNum.toString(), search);
-      console.log("Livestreams >>>>> ", data);
+      const data = await getAllLivestreams(pageNum, search);
       if (pageNum > 1) {
         setLivestreams([...livestreams, ...data.livestreams]);
       } else {

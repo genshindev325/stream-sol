@@ -60,14 +60,14 @@ export default function UploadVideo() {
     }
 
     if (text == "" || !regexTitle.test(text)) {
-      toast.error("Stream text must be non-empty and valid", {
+      toast.error("Promotional Text must be non-empty and valid", {
         duration: 3000,
       });
       return false;
     }
 
     if (link == "" || !urlPattern.test(link)) {
-      toast.error("Stream link must be non-empty and valid", {
+      toast.error("Promotional link must be non-empty and valid", {
         duration: 3000,
       });
       return false;
@@ -119,8 +119,13 @@ export default function UploadVideo() {
 
       toast.success("Successfully Created Livestream", { duration: 3000 });
       router.push(`/livestream/${livestream.roomId}`);
-    } catch (err) {
-      toast.error("Failed to Create Livestream", { duration: 3000 });
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        toast.error("You already created livestream.", { duration: 3000 });
+      } else {
+        toast.error("Failed to Create Livestream", { duration: 3000 });
+      }
     }
     setLoading(false);
   };
@@ -222,7 +227,7 @@ export default function UploadVideo() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
-                Stream Text*
+                Promotional Text*
               </div>
               <div className="border border-grey-800 px-4 rounded-lg">
                 <input
@@ -240,7 +245,7 @@ export default function UploadVideo() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
-                Stream Link*
+                Promotional Link*
               </div>
               <div className="border border-grey-800 px-4 rounded-lg">
                 <input
