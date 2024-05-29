@@ -1,9 +1,9 @@
-import Livestream from "@/app/livestream/[roomId]/page";
 import connectMongo from "@/libs/connect-mongo";
 import LivestreamModel from "@/models/livestream";
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { HttpStatusCode } from "axios";
 import { NextResponse } from "next/server";
+import { HUDDLE_API_KEY } from "@/libs/constants";
 
 export const dynamic = "force-dynamic";
 
@@ -13,32 +13,28 @@ export async function GET(request: Request) {
 
     await connectMongo();
 
-    const roomId = searchParams.get("roomId");
-    let role = "";
-    const publicKey = searchParams.get("publicKey");
+    const roomId = searchParams.get("roomId") as string;
+    const publicKey = searchParams.get("publicKey") as string;
 
-    console.log("Publick Key: ", publicKey);
-
-    if (publicKey == undefined) {
-      return new Response("Missing publicKey", { status: 400 });
+    if (!publicKey || !roomId) {
+      return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
     }
 
-    // Check publicKey is the host's or not
-    const livestream = await LivestreamModel.find({
+    const livestream = await LivestreamModel.findOne({
       roomId,
     });
-    const creator = livestream[0].creator;
-    publicKey == creator.publickey ? (role = "host") : (role = "listener");
 
-    if (!roomId) {
-      return new Response("Missing roomId", { status: 400 });
+    if(!livestream) {
+      return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
     }
 
+    const creator = livestream.creator;
+
     const accessToken = new AccessToken(
-      role == "host"
+      publicKey == creator.publickey
         ? {
-            apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
-            roomId: roomId as string,
+            apiKey: HUDDLE_API_KEY,
+            roomId: roomId,
             role: Role.HOST,
             permissions: {
               admin: true,
@@ -55,15 +51,14 @@ export async function GET(request: Request) {
             },
             options: {
               metadata: {
-                // you can add any custom attributes here which you want to associate with the user
                 walletAddress: publicKey,
                 displayName: "",
               },
             },
           }
         : {
-            apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
-            roomId: roomId as string,
+            apiKey: HUDDLE_API_KEY,
+            roomId: roomId,
             role: Role.LISTENER,
             permissions: {
               admin: false,
@@ -80,18 +75,16 @@ export async function GET(request: Request) {
             },
             options: {
               metadata: {
-                // you can add any custom attributes here which you want to associate with the user
                 walletAddress: publicKey,
+                displayName: "",
               },
             },
           }
     );
 
-    // return new Response(token, { status: 200 });
-
     const token: string = await accessToken.toJwt();
     return NextResponse.json({ token }, { status: HttpStatusCode.Ok });
   } catch (errors: any) {
-    return NextResponse.json({ status: HttpStatusCode.BadRequest });
+    return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
   }
 }

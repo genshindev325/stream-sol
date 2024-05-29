@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import axios, { HttpStatusCode } from "axios";
 import connectMongo from "@/libs/connect-mongo";
 import LivestreamModel from "@/models/livestream";
-import { HttpStatusCode } from "axios";
 import UserModel from "@/models/user";
+import { HUDDLE_API_KEY } from "@/libs/constants";
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
@@ -31,22 +32,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await fetch(
+    const data = await axios.post(
       "https://api.huddle01.com/api/v1/create-room",
       {
-        method: "POST",
-        body: JSON.stringify({
-          title: livestreamData.title,
-        }),
+        title: livestreamData.title,
+        description: livestreamData?.description!,
+        hostWallets: [userPk],
+      },
+      {
         headers: {
-          "Content-type": "application/json",
-          "x-api-key": process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
+          "Content-Type": "application/json",
+          "x-api-key": HUDDLE_API_KEY,
         },
-        cache: "no-cache",
       }
     );
 
-    const data = await response.json();
     const roomId = data.data.roomId;
 
     await connectMongo();
@@ -112,4 +112,42 @@ export async function DELETE(request: NextRequest) {
     { Message: "Successfully deleted!" },
     { status: HttpStatusCode.Ok }
   );
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const roomId = searchParams.get("roomId");
+    const inc = searchParams.get("inc") as string;
+
+    await connectMongo();
+
+    const livestream = await LivestreamModel.findOne({
+      roomId,
+    });
+
+    if (!livestream) {
+      return NextResponse.json(
+        { message: "Livestream Does Not Exist" },
+        { status: HttpStatusCode.NotFound }
+      );
+    }
+
+    let views = -1;
+    if (inc === "1") {
+      views = 1;
+    }
+
+    const result = await LivestreamModel.updateOne(
+      { roomId },
+      { $inc: { views } }
+    );
+
+    return NextResponse.json(
+      { livestream: result },
+      { status: HttpStatusCode.Ok }
+    );
+  } catch (errors: any) {
+    return NextResponse.json({ status: HttpStatusCode.NotModified });
+  }
 }

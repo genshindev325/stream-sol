@@ -87,9 +87,12 @@ export default function ProfilePage({ profile }: Props) {
     }
   }, [tab]);
 
+  if (loading) {
+    return <FullLoading />;
+  }
+
   return (
     <div className="relative w-full h-full mb-[32px] sm:mb-[48px]">
-      {loading && <FullLoading />}
       <div className="mx-[16px] sm:mx-auto flex-1 sm:w-[360px] lg:w-[600px] xl:w-[960px] 2xl:w-[1200px]">
         {profile?.banner ? (
           <img

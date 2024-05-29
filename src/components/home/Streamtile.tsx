@@ -1,8 +1,10 @@
-import { AvatarComponent } from "../common";
 import { useRouter } from "next/navigation";
+import { AvatarComponent } from "../common";
+import { Livestream } from "@/libs/types";
+import { formatTime } from "@/libs/helpers";
 
 type Props = {
-  livestream: any;
+  livestream: Livestream;
 };
 
 export default function Home({ livestream }: Props) {
@@ -37,8 +39,8 @@ export default function Home({ livestream }: Props) {
               {livestream.creator.username}
             </span>
             <div className="hidden sm:block">
-              <span className="mr-1">2 participants</span>•
-              <span className="ml-1">31 Mar 2024</span>
+              <span className="mr-1">{livestream.views} participants</span>•
+              <span className="ml-1">{formatTime(livestream.createdAt)}</span>
             </div>
           </div>
         </div>

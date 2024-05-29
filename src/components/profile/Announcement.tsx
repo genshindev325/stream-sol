@@ -21,9 +21,11 @@ import {
   doDislikeAnnouncement,
 } from "@/services/announcement";
 import { Announcement as AnnouncementProps } from "@/libs/types";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 /// Images
 import announcementPic from "@/assets/images/announcement.png";
+import videoPic from "@/assets/images/video.png";
 
 export default function Announcement({ profile }: { profile: User }) {
   const [content, setContent] = useState("");
@@ -34,6 +36,7 @@ export default function Announcement({ profile }: { profile: User }) {
   );
   const { publicKey } = useWallet();
   const [loading, setLoading] = useState(false);
+  const { user } = useAuthContext();
 
   const showMore = () => {
     const total = pageNum * ITEMS_PER_PAGE;
@@ -137,6 +140,10 @@ export default function Announcement({ profile }: { profile: User }) {
       window.scrollTo(0, documentHeight - windowHeight - 200);
     }
   }, [announcements]);
+
+  if (!user) {
+    return <NoComponent content="Connect Your Wallet" source={videoPic} />;
+  }
 
   return (
     <div className="relative flex flex-col flex-1 gap-4 text-[0.875rem] sm:text-[1rem]">

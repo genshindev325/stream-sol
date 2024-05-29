@@ -41,6 +41,7 @@ export type Livestream = {
   views: number;
   creator: User;
   roomId: string;
+  createdAt: string;
 };
 
 export type Archievedstream = {

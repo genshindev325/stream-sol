@@ -66,9 +66,6 @@ export default function ArchievedstreamPage({ archievedstreamData }: Props) {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-[120px] xl:w-[140px] h-[36px] xl:h-[44px] text-[0.875rem] lg:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-semibold bg-primary-300 ">
-                  Follow
-                </div>
                 <div className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] sm:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold">
                   <FaDollarSign />
                   Donate

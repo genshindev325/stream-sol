@@ -117,7 +117,7 @@ export default function UploadVideo() {
         thumbnail: imageHashValue,
       });
 
-      toast.success("Successfully Created Livestream", { duration: 3000 });
+      toast.success("Livestream is successfully created ", { duration: 3000 });
       router.push(`/livestream/${livestream.roomId}`);
     } catch (err: any) {
       const status = err?.response?.status;

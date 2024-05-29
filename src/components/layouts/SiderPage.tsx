@@ -11,21 +11,18 @@ import { CiStreamOn } from "react-icons/ci";
 import {
   MdClose,
   MdOutlineAdminPanelSettings,
-  MdOutlineAnnouncement,
 } from "react-icons/md";
 import { TbUserUp, TbUserDown } from "react-icons/tb";
 
 /// Custom
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { ADMIN_WALLETS, ITEMS_PER_PAGE } from "@/libs/constants";
+import { ADMIN_WALLETS } from "@/libs/constants";
 import { Livestream } from "@/libs/types";
 import { getAllLivestreams } from "@/services/livestream";
-import { AvatarComponent, LoadMore } from "../common";
+import { AvatarComponent } from "../common";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
-import userPic from "@/assets/svgs/user.svg";
-import { useRoom } from "@huddle01/react/hooks";
 
 export default function SiderPage({
   siderVisible,
@@ -41,8 +38,6 @@ export default function SiderPage({
   const roomId = pathname.split("/")[2];
   const [streamPage, setStreamPage] = useState<boolean>(false);
   const [livestreams, setLivestreams] = useState<Array<Livestream>>([]);
-
-  const { leaveRoom } = useRoom({});
 
   useEffect(() => {
     if (selected == "livestream" && roomId) {
