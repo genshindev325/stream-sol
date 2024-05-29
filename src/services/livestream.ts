@@ -70,7 +70,21 @@ export const stopRecording = async (roomId: string) => {
 export const increaseViews = async (roomId: string) => {
   const token = getAccessToken();
   const data = await axios.put(
-    `${API_CONFIG}/livestream/increaseViews?roomId=${roomId}`,
+    `${API_CONFIG}/livestream?roomId=${roomId}&inc=1`,
+    {},
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+  return data;
+};
+
+export const decreaseViews = async (roomId: string) => {
+  const token = getAccessToken();
+  const data = await axios.put(
+    `${API_CONFIG}/livestream?roomId=${roomId}&inc=0`,
     {},
     {
       headers: {

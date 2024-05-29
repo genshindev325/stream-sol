@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_CONFIG } from "../libs/constants";
+import { HUDDLE_API_KEY } from "../libs/constants";
 
 export const getRoomAccessToken = async ({
   roomId,
@@ -17,3 +18,15 @@ export const getRoomAccessToken = async ({
     // console.error("Error fetching room access token:", error);
   }
 };
+
+export const getRoomList = async () => {
+  const res = await axios.get(
+    'https://api.huddle01.com/api/v1/get-rooms',
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': HUDDLE_API_KEY,
+      }
+    }
+  );
+}

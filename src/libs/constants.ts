@@ -1,3 +1,5 @@
+import { PublicKey } from "@solana/web3.js";
+
 /// Solana RPC Endpoint
 export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC as string;
 
@@ -17,7 +19,9 @@ export const API_CONFIG = process.env.NEXT_PUBLIC_API_CONFIG as string;
 /// Protected Routes
 export const PROTECTED_ROUTES = ["/api/auth/verify-user"];
 
-export const SOL_MEDIA_MINT = process.env.NEXT_PUBLIC_SOL_MEDIA_MINT as string;
+export const SOL_MEDIA_MINT = new PublicKey(
+  process.env.NEXT_PUBLIC_SOL_MEDIA_MINT as string
+);
 
 /// Admin Wallets
 export const ADMIN_WALLETS = [

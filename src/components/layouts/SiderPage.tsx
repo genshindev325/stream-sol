@@ -11,20 +11,18 @@ import { CiStreamOn } from "react-icons/ci";
 import {
   MdClose,
   MdOutlineAdminPanelSettings,
-  MdOutlineAnnouncement,
 } from "react-icons/md";
 import { TbUserUp, TbUserDown } from "react-icons/tb";
 
 /// Custom
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { ADMIN_WALLETS, ITEMS_PER_PAGE } from "@/libs/constants";
+import { ADMIN_WALLETS } from "@/libs/constants";
 import { Livestream } from "@/libs/types";
 import { getAllLivestreams } from "@/services/livestream";
-import { AvatarComponent, LoadMore } from "../common";
+import { AvatarComponent } from "../common";
 
 /// Images
 import logoPic from "@/assets/images/logo.png";
-import userPic from "@/assets/svgs/user.svg";
 
 export default function SiderPage({
   siderVisible,
@@ -95,7 +93,8 @@ export default function SiderPage({
                     ? "text-white bg-[#FFFFFF0A]"
                     : "text-grey-400 hover:bg-[#FFFFFF0A]")
                 }
-                onClick={() => {
+                onClick={async () => {
+                  console.log(roomId);
                   router.push(`/livestream/${livestream.roomId}`);
                 }}
               >

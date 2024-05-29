@@ -23,7 +23,6 @@ const RemotePeer = ({ peerId }: Props) => {
   const screenAudioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    console.log("Remote Screen Video: ", screenVideo, screenState);
     if (screenVideo && screenVideoRef.current && screenState === "playable") {
       screenVideoRef.current.srcObject = screenVideo;
 
@@ -42,7 +41,6 @@ const RemotePeer = ({ peerId }: Props) => {
   }, [screenVideo]);
 
   useEffect(() => {
-    console.log("stream", stream, state);
     if (stream && vidRef.current && state === "playable") {
       vidRef.current.srcObject = stream;
 
@@ -106,12 +104,7 @@ const RemotePeer = ({ peerId }: Props) => {
           className="aspect-video rounded-xl lg:w-[800px]"
         />
       ) : (
-        <video
-          ref={screenVideoRef}
-          className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500"
-          autoPlay
-          muted
-        />
+        <div className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500" />
       )}
 
       {stream && (

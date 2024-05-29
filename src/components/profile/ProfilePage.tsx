@@ -24,6 +24,7 @@ import { isFollower, follow } from "@/services/profile";
 import userPic from "@/assets/svgs/user.svg";
 import { User } from "@/libs/types";
 import Videos from "./Videos";
+import DonateModal from "./DonateModal";
 
 type Props = {
   profile: User;
@@ -86,9 +87,12 @@ export default function ProfilePage({ profile }: Props) {
     }
   }, [tab]);
 
+  if (loading) {
+    return <FullLoading />;
+  }
+
   return (
     <div className="relative w-full h-full mb-[32px] sm:mb-[48px]">
-      {loading && <FullLoading />}
       <div className="mx-[16px] sm:mx-auto flex-1 sm:w-[360px] lg:w-[600px] xl:w-[960px] 2xl:w-[1200px]">
         {profile?.banner ? (
           <img
@@ -243,17 +247,17 @@ export default function ProfilePage({ profile }: Props) {
         )}
       </div>
 
-      {/* {donated && (
+      {donated && (
         <DonateModal
-          pk={pk}
-          name={name}
-          username={username}
-          avatar={avatar}
+          pk={profile.publickey}
+          name={profile.fullname}
+          username={profile.username}
+          avatar={profile.avatar!}
           onClose={() => {
             setDonated(false);
           }}
         />
-      )} */}
+      )}
     </div>
   );
 }

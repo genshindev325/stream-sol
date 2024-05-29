@@ -30,13 +30,11 @@ function ChatBox() {
       if (label === "chat") {
         setMessages((prev) => [...prev, { text: payload, sender: from }]);
         const roomId = params.roomId;
-        console.log(">>", roomId, from, payload);
         const chat = await creatChat({
           roomId,
           sender: from,
           content: payload,
         });
-        console.log("Messages: ", messages);
       }
     },
   });
@@ -45,7 +43,6 @@ function ChatBox() {
     const fetchData = async () => {
       const { livestream } = await getLivestreamByRoomId(params.roomId);
       const livestreamId = livestream.id;
-      console.log(livestreamId);
       const { chatHistory } = await getChatHistory({ livestreamId });
 
       let allMessages = [];
@@ -80,7 +77,7 @@ function ChatBox() {
   };
 
   return (
-    <div className="relative lg:w-[700px] md:w-[400px] xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh] ">
+    <div className="relative w-full xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh] ">
       <h1 className="text-center text-2xl my-2 border-b border-grey-800">
         Chat Room
       </h1>
