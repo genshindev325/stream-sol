@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { Recorder } from "@huddle01/server-sdk/recorder";
 import { HttpStatusCode } from "axios";
 
