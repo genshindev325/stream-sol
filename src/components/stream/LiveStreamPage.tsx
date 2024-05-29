@@ -36,6 +36,7 @@ import { BsSignStop } from "react-icons/bs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { createArchievedstream } from "@/services/archievedstream";
 import { IUser } from "@/models/user";
+import { Role } from "@huddle01/server-sdk/auth";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -72,7 +73,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     useLocalScreenShare();
   const { peerId, role, updateMetadata, metadata } =
     useLocalPeer<TPeerMetadata>();
-  const { peerIds } = usePeerIds();
+  const { peerIds } = usePeerIds({
+    roles: [Role.HOST],
+  });
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -84,6 +87,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     if (shareStream && screenRef.current) {
       screenRef.current.srcObject = shareStream;
     }
+    console.log("Share stream: ", shareStream);
   }, [shareStream]);
 
   useEffect(() => {
@@ -143,135 +147,146 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
           <div className="flex max-xl:flex-col gap-[16px] mx-auto mb-[32px] sm:mb-[48px]">
             <div className="flex flex-col grow gap-[16px] m-[10px]">
-              <div className="mx-auto relative">
-                {shareStream ? (
-                  <video
-                    ref={screenRef}
-                    className="aspect-video rounded-xl lg:w-[800px]"
-                    autoPlay
-                    muted
-                  />
-                ) : (
-                  <video
-                    ref={screenRef}
-                    className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500"
-                    autoPlay
-                    muted
-                  />
-                )}
+              {role == Role.HOST && (
+                <>
+                  <div className="mx-auto relative">
+                    {shareStream ? (
+                      <video
+                        ref={screenRef}
+                        className="aspect-video rounded-xl lg:w-[800px]"
+                        autoPlay
+                        muted
+                      />
+                    ) : (
+                      <video
+                        ref={screenRef}
+                        className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500"
+                        autoPlay
+                        muted
+                      />
+                    )}
 
-                <div className="mt-8 mb-32 grid gap-2 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
+                    {isVideoOn && (
+                      <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
+                        <video
+                          ref={videoRef}
+                          className="aspect-video rounded-xl"
+                          autoPlay
+                          muted
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="z-10 max-w-20xl w-full items-center justify-center font-mono text-[1.5rem] lg:flex">
+                    <div className="flex justify-center">
+                      {state === "connected" && (
+                        <>
+                          <button
+                            type="button"
+                            className="bg-blue-500 p-2 mx-2 rounded-lg"
+                            onClick={async () => {
+                              isVideoOn
+                                ? await disableVideo()
+                                : await enableVideo();
+                            }}
+                          >
+                            {isVideoOn ? <AiFillCamera /> : <AiOutlineCamera />}
+                          </button>
+                          <button
+                            type="button"
+                            className="bg-blue-500 p-2 mx-2 rounded-lg"
+                            onClick={async () => {
+                              isAudioOn
+                                ? await disableAudio()
+                                : await enableAudio();
+                            }}
+                          >
+                            {isAudioOn ? (
+                              <AiOutlineAudio />
+                            ) : (
+                              <AiOutlineAudioMuted />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            className="bg-blue-500 p-2 mx-2 rounded-lg"
+                            onClick={async () => {
+                              shareStream
+                                ? await stopScreenShare()
+                                : await startScreenShare();
+                            }}
+                          >
+                            {shareStream ? (
+                              <LuScreenShareOff />
+                            ) : (
+                              <LuScreenShare />
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            className="bg-red-500 p-2 mx-2 rounded-lg"
+                            onClick={async () => {
+                              try {
+                                console.log(isRecording);
+                                if (isRecording) {
+                                  const status = await stopRecording(
+                                    params.roomId
+                                  );
+                                  console.log(params.roomId, status.data);
+                                  const data = await status.data;
+
+                                  if (data.recording.recordingUrl) {
+                                    console.log(
+                                      params.roomId,
+                                      " Data: ",
+                                      data.recording.recordingUrl
+                                    );
+                                    await closeRoom();
+                                    const archievedstream =
+                                      await createArchievedstream({
+                                        title: livestreamData.title,
+                                        description:
+                                          livestreamData.description!,
+                                        thumbnail: livestreamData.thumbnail,
+                                        roomId: livestreamData.roomId,
+                                        creator:
+                                          livestreamData.creator.publickey,
+                                        video: data.recording.recordingUrl,
+                                      });
+                                    console.log(
+                                      "Archievedstream Data: ",
+                                      archievedstream
+                                    );
+                                    await endLivestream({
+                                      roomId: livestreamData.roomId,
+                                    });
+                                    router.push(
+                                      `/profile/${user?.username}?tab=videos`
+                                    );
+                                  }
+                                }
+                              } catch (error) {
+                                console.log(error);
+                              }
+                            }}
+                          >
+                            <FaWindowClose />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {role != Role.HOST && (
+                <div className="mx-auto relative">
                   {peerIds.map((peerId) =>
                     peerId ? <RemotePeer key={peerId} peerId={peerId} /> : null
                   )}
                 </div>
-
-                {isVideoOn && (
-                  <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
-                    <video
-                      ref={videoRef}
-                      className="aspect-video rounded-xl"
-                      autoPlay
-                      muted
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="z-10 max-w-20xl w-full items-center justify-center font-mono text-[1.5rem] lg:flex">
-                {/* <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-              <code className="font-mono font-bold">{state}</code>
-            </p> */}
-                <div className="flex justify-center">
-                  {state === "connected" && (
-                    <>
-                      <button
-                        type="button"
-                        className="bg-blue-500 p-2 mx-2 rounded-lg"
-                        onClick={async () => {
-                          isVideoOn
-                            ? await disableVideo()
-                            : await enableVideo();
-                        }}
-                      >
-                        {isVideoOn ? <AiFillCamera /> : <AiOutlineCamera />}
-                      </button>
-                      <button
-                        type="button"
-                        className="bg-blue-500 p-2 mx-2 rounded-lg"
-                        onClick={async () => {
-                          isAudioOn
-                            ? await disableAudio()
-                            : await enableAudio();
-                        }}
-                      >
-                        {isAudioOn ? (
-                          <AiOutlineAudio />
-                        ) : (
-                          <AiOutlineAudioMuted />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        className="bg-blue-500 p-2 mx-2 rounded-lg"
-                        onClick={async () => {
-                          shareStream
-                            ? await stopScreenShare()
-                            : await startScreenShare();
-                        }}
-                      >
-                        {shareStream ? <LuScreenShareOff /> : <LuScreenShare />}
-                      </button>
-                      <button
-                        type="button"
-                        className="bg-red-500 p-2 mx-2 rounded-lg"
-                        onClick={async () => {
-                          try {
-                            console.log(isRecording);
-                            if (isRecording) {
-                              const status = await stopRecording(params.roomId);
-                              console.log(params.roomId, status.data);
-                              const data = await status.data;
-
-                              if (data.recording.recordingUrl) {
-                                console.log(
-                                  params.roomId,
-                                  " Data: ",
-                                  data.recording.recordingUrl
-                                );
-                                await closeRoom();
-                                const archievedstream =
-                                  await createArchievedstream({
-                                    title: livestreamData.title,
-                                    description: livestreamData.description!,
-                                    thumbnail: livestreamData.thumbnail,
-                                    roomId: livestreamData.roomId,
-                                    creator: livestreamData.creator.publickey,
-                                    video: data.recording.recordingUrl,
-                                  });
-                                console.log(
-                                  "Archievedstream Data: ",
-                                  archievedstream
-                                );
-                                await endLivestream({
-                                  roomId: livestreamData.roomId,
-                                });
-                                router.push(
-                                  `/profile/${user?.username}?tab=videos`
-                                );
-                              }
-                            }
-                          } catch (error) {
-                            console.log(error);
-                          }
-                        }}
-                      >
-                        <FaWindowClose />
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
+              )}
 
               <div className="text-[1.25rem] sm:text-[1.5rem] break- font-semibold">
                 {livestreamData?.title}
