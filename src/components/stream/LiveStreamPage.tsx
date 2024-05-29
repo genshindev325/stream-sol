@@ -349,8 +349,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                 )}
               </div>
             </div>
-
-            {state === "connected" && <ChatBox />}
+            <ChatBox />
           </div>
         </div>
       )}

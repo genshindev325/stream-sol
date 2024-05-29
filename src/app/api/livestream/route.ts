@@ -10,6 +10,8 @@ export async function POST(request: Request) {
   const livestreamData = await request.json();
 
   try {
+    await connectMongo();
+
     const creator = await UserModel.findOne({
       publickey: userPk,
     });
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
     if (!creator) {
       return NextResponse.json(
         { livestream: null },
-        { status: HttpStatusCode.BadRequest }
+        { status: HttpStatusCode.NotFound }
       );
     }
 
@@ -32,12 +34,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const data = await axios.post(
+    console.log("-----------------------------------------");
+    const { data } = await axios.post(
       "https://api.huddle01.com/api/v1/create-room",
       {
         title: livestreamData.title,
-        description: livestreamData?.description!,
-        hostWallets: [userPk],
       },
       {
         headers: {
@@ -48,9 +49,7 @@ export async function POST(request: Request) {
     );
 
     const roomId = data.data.roomId;
-
-    await connectMongo();
-
+    console.log("-----------------------------------------", roomId);
     const livestream = new LivestreamModel({
       ...livestreamData,
       creator,
