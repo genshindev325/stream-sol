@@ -8,8 +8,8 @@ import React, {
   import { Livestream } from "@/libs/types";
   
   export interface LivestreamsContextState {
-    livestreams: Livestream[] | null;
-    setLivestreams(livestreams: Livestream[] | null): void;
+    livestreams: Livestream[];
+    setLivestreams(livestreams: Livestream[]): void;
   }
   
   export const LivestreamsContext = createContext<LivestreamsContextState>(
@@ -23,7 +23,7 @@ import React, {
   export const LivestreamsContextProvider: FC<{ children: ReactNode }> = ({
     children,
   }) => {
-    const [livestreams, setLivestreams] = useState<Livestream[] | null>(null);
+    const [livestreams, setLivestreams] = useState<Livestream[]>([]);
   
     return (
       <LivestreamsContext.Provider value={{ livestreams, setLivestreams }}>

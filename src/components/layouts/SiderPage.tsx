@@ -38,7 +38,6 @@ export default function SiderPage({
   const pathname = usePathname();
   const router = useRouter();
   const selected = pathname.split("/")[1];
-  const roomId = pathname.split("/")[2];
   const { livestreams, setLivestreams } = useLivestreamsContext();
   const [pageNum, setPageNum] = useState(1);
   const [count, setCount] = useState(0);
@@ -55,10 +54,11 @@ export default function SiderPage({
   }, []);
 
   useEffect(() => {
+    const roomId = pathname.split("/")[2];
     console.log(selected, roomId);
-    if (selected == "livestream" && roomId != null) setSiderVisible(true);
-    else setSiderVisible(false);
-  }, [selected, roomId]);
+    // if (selected == "livestream" && roomId != null) setSiderVisible(true);
+    // else setSiderVisible(false);
+  }, [pathname]);
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -92,19 +92,10 @@ export default function SiderPage({
     fetchVideos();
   }, [pageNum]);
 
-  useEffect(() => {
-    if (lives.length > ITEMS_PER_PAGE) {
-      const documentHeight = document.documentElement.scrollHeight;
-      const windowHeight = window.innerHeight;
-
-      window.scrollTo(0, documentHeight - windowHeight - 400);
-    }
-  }, [lives]);
-
   return (
     <div
       className={
-        "fixed w-full md:w-[280px] h-full md:pt-[80px] z-20 md:z-0 top-0 md:flex flex-col gap-[8px] py-[24px] bg-background border-r border-1 border-solid border-[#FFFFFF0D]" +
+        "fixed w-full md:w-[280px] h-full md:pt-[80px] z-40 md:z-0 top-0 md:flex flex-col gap-[8px] py-[24px] bg-background border-r border-1 border-solid border-[#FFFFFF0D]" +
         (siderVisible ? " flex" : " hidden")
       }
     >
@@ -125,140 +116,137 @@ export default function SiderPage({
       />
 
       {/* Home Sidebar */}
-      {!siderVisible ? (
-        <>
-          <Link
-            href="/"
-            className={
-              "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-              (selected === ""
-                ? " text-white bg-[#FFFFFF0A]"
-                : " text-grey-400 hover:bg-[#FFFFFF0A]")
-            }
-          >
-            <GoHome size={24} color={selected === "" ? "white" : "#BFBFBF"} />
-            <span className="font-semibold block">Home</span>
-          </Link>
+      <>
+        <Link
+          href="/"
+          className={
+            "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
+            (selected === ""
+              ? " text-white bg-[#FFFFFF0A]"
+              : " text-grey-400 hover:bg-[#FFFFFF0A]")
+          }
+        >
+          <GoHome size={24} color={selected === "" ? "white" : "#BFBFBF"} />
+          <span className="font-semibold block">Home</span>
+        </Link>
 
-          {user && (
-            <>
-              {/* Divider */}
+        {user && (
+          <>
+            {/* Divider */}
 
-              <div className="h-[1px] w-full bg-grey-800"></div>
+            <div className="h-[1px] w-full bg-grey-800"></div>
 
-              {/* Create LiveStream */}
+            {/* Create LiveStream */}
 
+            <Link
+              href="/livestream"
+              className={
+                "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
+                (selected === "livestream"
+                  ? " text-white bg-[#FFFFFF0A]"
+                  : " text-grey-400 hover:bg-[#FFFFFF0A]")
+              }
+            >
+              <CiStreamOn
+                size={24}
+                color={selected === "livestream" ? "white" : "#BFBFBF"}
+              />
+
+              <span className="font-semibold block">Create LiveStream</span>
+            </Link>
+
+            {/* Following */}
+
+            <Link
+              href="/following"
+              className={
+                "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
+                (selected === "following"
+                  ? " text-white bg-[#FFFFFF0A]"
+                  : " text-grey-400 hover:bg-[#FFFFFF0A]")
+              }
+            >
+              <TbUserUp
+                size={24}
+                color={selected === "following" ? "white" : "#BFBFBF"}
+              />
+
+              <span className="font-semibold block">Following</span>
+            </Link>
+
+            {/* Followers */}
+
+            <Link
+              href="/followers"
+              className={
+                "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
+                (selected === "followers"
+                  ? " text-white bg-[#FFFFFF0A]"
+                  : " text-grey-400 hover:bg-[#FFFFFF0A]")
+              }
+            >
+              <TbUserDown
+                size={24}
+                color={selected === "followers" ? "white" : "#BFBFBF"}
+              />
+
+              <span className="font-semibold block">Followers</span>
+            </Link>
+
+            {user && ADMIN_WALLETS.includes(user.publickey) && (
               <Link
-                href="/livestream"
+                href="/admin"
                 className={
                   "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-                  (selected === "livestream"
+                  (selected === "admin"
                     ? " text-white bg-[#FFFFFF0A]"
                     : " text-grey-400 hover:bg-[#FFFFFF0A]")
                 }
               >
-                <CiStreamOn
-                  size={24}
-                  color={selected === "livestream" ? "white" : "#BFBFBF"}
-                />
-
-                <span className="font-semibold block">Create LiveStream</span>
+                <MdOutlineAdminPanelSettings size={24} />
+                <span className="font-semibold block">Admin</span>
               </Link>
-
-              {/* Following */}
-
-              <Link
-                href="/following"
-                className={
-                  "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-                  (selected === "following"
-                    ? " text-white bg-[#FFFFFF0A]"
-                    : " text-grey-400 hover:bg-[#FFFFFF0A]")
-                }
-              >
-                <TbUserUp
-                  size={24}
-                  color={selected === "following" ? "white" : "#BFBFBF"}
+            )}
+          </>
+        )}
+      </>
+      {/* <div className="flex flex-col justify-normal gap-2 overflow-auto">
+        {lives?.map((livestream, idx) => {
+          return (
+            <div
+              key={idx}
+              className="flex items-center justify-center w-full gap-2 cursor-pointer"
+              onClick={() => {
+                router.push(`/livestream/${livestream.roomId}`);
+              }}
+            >
+              <div className="flex gap-2">
+                <AvatarComponent
+                  avatar={livestream.creator?.avatar}
+                  size={48}
                 />
-
-                <span className="font-semibold block">Following</span>
-              </Link>
-
-              {/* Followers */}
-
-              <Link
-                href="/followers"
-                className={
-                  "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-                  (selected === "followers"
-                    ? " text-white bg-[#FFFFFF0A]"
-                    : " text-grey-400 hover:bg-[#FFFFFF0A]")
-                }
-              >
-                <TbUserDown
-                  size={24}
-                  color={selected === "followers" ? "white" : "#BFBFBF"}
-                />
-
-                <span className="font-semibold block">Followers</span>
-              </Link>
-
-              {user && ADMIN_WALLETS.includes(user.publickey) && (
-                <Link
-                  href="/admin"
-                  className={
-                    "flex items-center gap-[16px] h-[48px] rounded-lg p-[8px] mx-[16px] text-[1rem] sm:text-[1.25rem] hover:cursor-pointer" +
-                    (selected === "admin"
-                      ? " text-white bg-[#FFFFFF0A]"
-                      : " text-grey-400 hover:bg-[#FFFFFF0A]")
-                  }
-                >
-                  <MdOutlineAdminPanelSettings size={24} />
-                  <span className="font-semibold block">Admin</span>
-                </Link>
-              )}
-            </>
-          )}
-        </>
-      ) : (
-        <div className="flex flex-col justify-normal gap-2 overflow-auto">
-          {lives?.map((livestream, idx) => {
-            return (
-              <div
-                key={idx}
-                className="flex items-center justify-center w-full gap-2 cursor-pointer"
-                onClick={() => {
-                  router.push(`/livestream/${livestream.roomId}`);
-                }}
-              >
-                <div className="flex gap-2">
-                  <AvatarComponent
-                    avatar={livestream.creator?.avatar}
-                    size={48}
-                  />
-                  <div className="flex flex-col md:w-[130px]">
-                    <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
-                      {livestream.creator?.username
-                        ? livestream.creator?.username
-                        : "No Username"}
-                    </div>
-                    <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light truncate">
-                      {livestream.description || ""}
-                    </div>
+                <div className="flex flex-col md:w-[130px]">
+                  <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
+                    {livestream.creator?.username
+                      ? livestream.creator?.username
+                      : "No Username"}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-[16px] h-[16px] rounded-full bg-green-500" />
-                    <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
-                      {livestream.views}
-                    </div>
+                  <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light truncate">
+                    {livestream.description || ""}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-[16px] h-[16px] rounded-full bg-green-500" />
+                  <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
+                    {livestream.views}
                   </div>
                 </div>
               </div>
-            );
-          })}
-          {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
-        </div>
-      )}
+            </div>
+          );
+        })}
+        {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
+      </div> */}
     </div>
   );
 }

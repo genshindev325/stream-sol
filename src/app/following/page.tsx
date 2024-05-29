@@ -30,7 +30,7 @@ type Following = {
 
 export default function Following() {
   const { publicKey } = useWallet();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [pageCount, setPageCount] = useState(0);
   const [pageNum, setPageNum] = useState(1);
   const [followings, setFollowings] = useState<Array<Following>>([]);
@@ -69,81 +69,79 @@ export default function Following() {
     return <NoWallet />;
   }
 
+  if (loading) {
+    return <PageLoading />;
+  }
+
+  if (pageCount === 0) {
+    return <NoComponent content="No Following" source={peoplePic} />;
+  }
+
   return (
     <>
-      {loading ? (
-        <PageLoading />
-      ) : pageCount === 0 ? (
-        <NoComponent content="No Following" source={peoplePic} />
-      ) : (
-        <>
-          <div className="text-[32px] my-[16px] text-center sm:text-start font-bold">
-            Your Following
-          </div>
-          <div className="flex flex-col px-[16px] gap-[16px]">
-            {followings.map((following) => {
-              return (
-                <div
-                  className="flex justify-between items-center"
-                  key={following.user.id}
-                >
-                  <Link
-                    className="flex gap-[8px] hover:cursor-pointer"
-                    href={`/profile/${following.user.username}`}
-                  >
-                    <AvatarComponent avatar={user?.avatar} size={48} />
-                    <div className="flex flex-col">
-                      <div className="text-[18px]">
-                        {following.user.fullname}
-                      </div>
-                      <div className="text-[14px]">
-                        {following.user.followers === 0
-                          ? "No"
-                          : following.user.followers}{" "}
-                        followers
-                      </div>
-                    </div>
-                  </Link>
-                  <div
-                    className="w-[120px] h-[40px] flex justify-center items-center hover:cursor-pointer border border-[#AE7AFF] bg-white text-[#AE7AFF]"
-                    onClick={() => {
-                      doFollow(following.user.publickey);
-                    }}
-                  >
-                    Unfollow
+      <div className="text-[32px] my-[16px] text-center sm:text-start font-bold">
+        Your Following
+      </div>
+      <div className="flex flex-col px-[16px] gap-[16px]">
+        {followings.map((following) => {
+          return (
+            <div
+              className="flex justify-between items-center"
+              key={following.user.id}
+            >
+              <Link
+                className="flex gap-[8px] hover:cursor-pointer"
+                href={`/profile/${following.user.username}`}
+              >
+                <AvatarComponent avatar={user?.avatar} size={48} />
+                <div className="flex flex-col">
+                  <div className="text-[18px]">{following.user.fullname}</div>
+                  <div className="text-[14px]">
+                    {following.user.followers === 0
+                      ? "No"
+                      : following.user.followers}{" "}
+                    followers
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {pageCount > 1 && (
-            <div className="flex justify-end mt-[24px] px-[16px]">
-              <ReactPaginate
-                previousLabel="<"
-                nextLabel=">"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-                breakLabel="..."
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                pageCount={pageCount}
-                marginPagesDisplayed={1}
-                pageRangeDisplayed={2}
-                onPageChange={(event: any) => {
-                  setPageNum(event.selected);
+              </Link>
+              <div
+                className="w-[120px] h-[40px] flex justify-center items-center hover:cursor-pointer border border-[#AE7AFF] bg-white text-[#AE7AFF]"
+                onClick={() => {
+                  doFollow(following.user.publickey);
                 }}
-                containerClassName="pagination"
-                activeClassName="active"
-                forcePage={pageNum}
-              />
+              >
+                Unfollow
+              </div>
             </div>
-          )}
-        </>
+          );
+        })}
+      </div>
+
+      {pageCount > 1 && (
+        <div className="flex justify-end mt-[24px] px-[16px]">
+          <ReactPaginate
+            previousLabel="<"
+            nextLabel=">"
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            breakLabel="..."
+            breakClassName="page-item"
+            breakLinkClassName="page-link"
+            pageCount={pageCount}
+            marginPagesDisplayed={1}
+            pageRangeDisplayed={2}
+            onPageChange={(event: any) => {
+              setPageNum(event.selected);
+            }}
+            containerClassName="pagination"
+            activeClassName="active"
+            forcePage={pageNum}
+          />
+        </div>
       )}
     </>
   );

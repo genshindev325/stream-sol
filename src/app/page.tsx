@@ -7,6 +7,7 @@ import { LoadMore, PageLoading, NoComponent } from "@/components/common";
 import { getAllLivestreams } from "@/services/livestream";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import Streamtile from "@/components/home/Streamtile";
+import { useLivestreamsContext } from "@/contexts/LivestreamsContextProvider";
 
 /// Images
 import videoPic from "@/assets/images/video.png";
@@ -15,9 +16,10 @@ export default function Main() {
   const [pageNum, setPageNum] = useState(1);
   const [count, setCount] = useState(0);
   const [lives, setLives] = useState<Array<any>>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
+  const { livestreams, setLivestreams } = useLivestreamsContext();
 
   const fetchVideos = async () => {
     setLoading(true);
@@ -63,17 +65,17 @@ export default function Main() {
     return <PageLoading />;
   }
 
+  if (lives.length === 0) {
+    return <NoComponent content="No Livestream" source={videoPic} />;
+  }
+
   return (
-    <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
-      {lives.length === 0 ? (
-        <NoComponent content="No Livestream" source={videoPic} />
-      ) : (
-        <div className="flex flex-wrap justify-center md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
-          {lives.map((livestream, idx) => {
-            return <Streamtile key={idx} livestream={livestream} />;
-          })}
-        </div>
-      )}
+    <div className="flex flex-col flex-1 p-[12px] sm:p-[16px]">
+      <div className="flex flex-wrap justify-center md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
+        {lives.map((livestream, idx) => {
+          return <Streamtile key={idx} livestream={livestream} />;
+        })}
+      </div>
       {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
     </div>
   );
