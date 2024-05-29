@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 /// Icons
 import { GoHome } from "react-icons/go";
@@ -36,6 +36,7 @@ export default function SiderPage({
 }) {
   const { user } = useAuthContext();
   const pathname = usePathname();
+  const router = useRouter();
   const selected = pathname.split("/")[1];
   const roomId = pathname.split("/")[2];
   const { livestreams, setLivestreams } = useLivestreamsContext();
@@ -223,7 +224,13 @@ export default function SiderPage({
         <div className="flex flex-col justify-normal gap-2 overflow-auto">
           {lives?.map((livestream, idx) => {
             return (
-              <div key={idx} className="w-full justify-between gap-2">
+              <div
+                key={idx}
+                className="w-full justify-between gap-2 cursor-pointer"
+                onClick={() => {
+                  router.push(`/livestream/${livestream.roomId}`);
+                }}
+              >
                 <div className="flex gap-2">
                   <AvatarComponent
                     avatar={livestream.creator?.avatar}

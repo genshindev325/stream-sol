@@ -18,6 +18,7 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import {
   endLivestream,
   getLivestreamByRoomId,
+  increaseViews,
   startRecording,
   stopRecording,
 } from "@/services/livestream";
@@ -30,13 +31,11 @@ import {
   AiOutlineCamera,
 } from "react-icons/ai";
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
-import { HiMiniPlayPause } from "react-icons/hi2";
 import { getRoomAccessToken } from "@/services/room";
-import { BsSignStop } from "react-icons/bs";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { createArchievedstream } from "@/services/archievedstream";
-import { IUser } from "@/models/user";
 import { Role } from "@huddle01/server-sdk/auth";
+import toast from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -62,10 +61,15 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       console.log(peerId, role);
       updateMetadata({ displayName });
     },
-    onPeerJoin: (peer) => {
-      console.log("onPeerJoin", peer);
+    onPeerJoin: async (peer) => {
+      const response = await increaseViews(params.roomId);
+      console.log("onPeerJoin", peer, response);
+    },
+    onLeave: ({ reason }) => {
+      // if (reason == "CLOSED") alert("Closed!!!")
     },
   });
+
   console.log("State: ", state);
   const { enableVideo, isVideoOn, stream, disableVideo } = useLocalVideo();
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio();
@@ -103,27 +107,34 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const roomId = params.roomId;
-      if (!isRecording && state == "connected" && role == "host") {
-        const status = await startRecording(roomId);
-        console.log(roomId, status);
-        setIsRecording(true);
+    if (state == "closed") {
+      if (role != Role.HOST) {
+        toast.success("This livestream has been closed!", { duration: 3000 });
       }
-    };
+      router.push(`/`);
+    } else {
+      const fetchData = async () => {
+        const roomId = params.roomId;
+        if (!isRecording && state == "connected" && role == "host") {
+          const status = await startRecording(roomId);
+          console.log(roomId, status);
+          setIsRecording(true);
+        }
+      };
 
-    fetchData();
+      fetchData();
+    }
   }, [state]);
 
   return (
     <>
-      {state === "idle" ? (
+      {state === "idle" || state === "left" ? (
         <>
           <div className="flex justify-center min-h-[95vh]">
             <button
               disabled={user ? false : true}
               type="button"
-              className="bg-blue-500 p-2 mx-2 rounded-lg h-[40px] my-auto"
+              className="w-[220px] h-[60px] flex justify-center items-center hover:cursor-pointer bg-primary-300 text-white text-lg rounded-lg my-auto"
               onClick={async () => {
                 try {
                   setDisplayName(user?.username || "");
@@ -139,7 +150,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                 }
               }}
             >
-              {joining ? "Joining..." : "Join Room"}
+              {joining ? "Joining..." : "Go to Livetream"}
             </button>
           </div>
         </>
@@ -236,7 +247,8 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                                   console.log(params.roomId, status.data);
                                   const data = await status.data;
 
-                                  if (data.recording.recordingUrl) {
+                                  // if (data.recording.recordingUrl) {
+                                  if (1) {
                                     console.log(
                                       params.roomId,
                                       " Data: ",
@@ -304,7 +316,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                     </div>
                     <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light">
                       <a href={livestreamData?.link} target="_blank">
-                        {livestreamData?.text}
+                        ${livestreamData?.text}
                       </a>
                     </div>
                   </div>

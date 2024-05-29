@@ -51,6 +51,7 @@ export default function UploadVideo() {
   const validateForm = () => {
     const regexTitle = /^[A-Za-z0-9]+$/;
     const regexLink = /^[a-zA-Z0-9\-_:.\/?=&"{}()]+$/;
+    const urlPattern = /^(ftp|http|https):\/\/[^ "]+$/;
 
     if (title == "" || !regexTitle.test(title)) {
       toast.error("A stream title must be non-empty and valid", {
@@ -66,7 +67,7 @@ export default function UploadVideo() {
       return false;
     }
 
-    if (link == "" || !regexLink.test(link)) {
+    if (link == "" || !urlPattern.test(link)) {
       toast.error("A stream link must be non-empty and valid", {
         duration: 3000,
       });
@@ -128,6 +129,7 @@ export default function UploadVideo() {
       console.log(roomId);
       router.push(`/livestream/${roomId}`);
     } catch (err) {
+      setLoading(false);
       toast.error("Failed to create a livestream", { duration: 3000 });
       console.error(err);
     }

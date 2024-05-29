@@ -53,7 +53,7 @@ export const LivestreamSchema = new Schema<ILivestream>(
     /// Views
     views: {
       type: Number,
-      default: 0,
+      default: 1,
       validate: {
         validator: function (value: number) {
           return Number.isInteger(value) && value >= 0;

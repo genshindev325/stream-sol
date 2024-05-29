@@ -36,7 +36,7 @@ export const createLivestream = async ({
   const token = getAccessToken();
   const { data } = await axios.post(
     `${API_CONFIG}/livestream`,
-    { title, description, text, link, view: 0, thumbnail, roomId },
+    { title, description, text, link, views: 1, thumbnail, roomId },
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -82,6 +82,20 @@ export const startRecording = async (roomId: string) => {
 export const stopRecording = async (roomId: string) => {
   const data = await axios.get(
     `${API_CONFIG}/livestream/stopRecording?roomId=${roomId}`
+  );
+  return data;
+};
+
+export const increaseViews = async (roomId: string) => {
+  const token = getAccessToken();
+  const data = await axios.put(
+    `${API_CONFIG}/livestream/increaseViews?roomId=${roomId}`,
+    {},
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
   );
   return data;
 };
