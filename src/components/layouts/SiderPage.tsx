@@ -109,7 +109,7 @@ export default function SiderPage({
                       {livestream.creator.username}
                     </div>
                     <div className="text-[0.875rem] text-grey-500 font-light truncate">
-                      {livestream?.description!}
+                      {livestream.title}
                     </div>
                   </div>
                 </div>

@@ -105,7 +105,11 @@ export default function LiveStreamPage({ livestreamData }: Props) {
 
   const joinStream = async () => {
     const roomId = livestreamData.roomId;
-    if (!user || joining) {
+    if (!user) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+    if (joining) {
       return;
     }
     setJoining(true);
@@ -115,7 +119,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         publicKey: user.publickey,
       });
       setDisplayName(user.username || "");
-      console.log(user.username, roomId, token);
       await joinRoom({
         roomId,
         token,
@@ -164,18 +167,15 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   return (
     <>
       {state === "idle" || state === "left" ? (
-        <>
-          <div className="flex justify-center min-h-[95vh]">
-            <button
-              disabled={user ? false : true}
-              type="button"
-              className="w-[220px] h-[60px] flex justify-center items-center hover:cursor-pointer bg-primary-300 text-white text-lg rounded-lg my-auto"
-              onClick={joinStream}
-            >
-              {joining ? "Joining..." : "Go to Livetream"}
-            </button>
-          </div>
-        </>
+        <div className="flex justify-center flex-1">
+          <button
+            type="button"
+            className="w-[220px] h-[60px] flex justify-center items-center hover:cursor-pointer bg-primary-300 text-white text-lg rounded-lg my-auto"
+            onClick={joinStream}
+          >
+            {joining ? "Joining..." : "Go to Livetream"}
+          </button>
+        </div>
       ) : (
         <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
           <div className="flex max-xl:flex-col gap-[16px] mx-auto mb-[32px] sm:mb-[48px]">
