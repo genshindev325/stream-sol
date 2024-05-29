@@ -5,6 +5,9 @@ export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC as string;
 export const HUDDLE_PROJECT_ID = process.env
   .NEXT_PUBLIC_HUDDLE_PROJECT_ID as string;
 
+/// Huddle API key
+export const HUDDLE_API_KEY = process.env.NEXT_PUBLIC_HUDDLE_API_KEY as string;
+
 /// Local Storage Token
 export const LOCAL_STORAGE = "mediastreamtoken";
 
@@ -13,6 +16,8 @@ export const API_CONFIG = process.env.NEXT_PUBLIC_API_CONFIG as string;
 
 /// Protected Routes
 export const PROTECTED_ROUTES = ["/api/auth/verify-user"];
+
+export const SOL_MEDIA_MINT = process.env.NEXT_PUBLIC_SOL_MEDIA_MINT as string;
 
 /// Admin Wallets
 export const ADMIN_WALLETS = [
