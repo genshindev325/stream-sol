@@ -144,11 +144,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         const status = await stopRecording(livestreamData.roomId);
         const data = await status.data;
 
-        console.log(
-          livestreamData.roomId,
-          " Data: ",
-          data.recording.recordingUrl
-        );
         closeRoom();
         const archievedstream = await createArchievedstream({
           title: livestreamData.title,
@@ -158,7 +153,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
           creator: livestreamData.creator.publickey,
           video: data.recording.recordingUrl,
         });
-        console.log("Archievedstream Data: ", archievedstream);
         await endLivestream({
           roomId: livestreamData.roomId,
         });

@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom Import
-import { LoadMore, NoComponent, PageLoading } from "../common";
+import { LoadMore, NoComponent, PageLoading, NoWallet } from "../common";
 
 /// Utils
 import { formatTime } from "@/libs/helpers";
@@ -142,7 +142,7 @@ export default function Announcement({ profile }: { profile: User }) {
   }, [announcements]);
 
   if (!user) {
-    return <NoComponent content="Connect Your Wallet" source={videoPic} />;
+    return <NoWallet />;
   }
 
   return (
