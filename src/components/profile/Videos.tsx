@@ -64,14 +64,14 @@ export default function Videos({ profile }: { profile: User }) {
       ) : (
         <>
           <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
-            <div className="flex flex-wrap justify-center md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
+            <div className="flex flex-wrap justify-between md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
               {videos.map((video) => {
                 return (
                   <div
                     key={video.id}
                     className="flex flex-col gap-[8px] w-[320px] sm:w-[240px]"
                   >
-                    <div className="relative w-[320px] sm:w-[240px] h-[180px] sm:h-[135px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer">
+                    <div className="relative w-[320px] sm:w-[260px] h-[180px] sm:h-[170px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer">
                       <button
                         onClick={() => {
                           //   alert(video.id);
@@ -92,8 +92,8 @@ export default function Videos({ profile }: { profile: User }) {
                         Test
                       </div>
                     </div>
-                    <div className="flex gap-4 px-2 hover:cursor-pointer"></div>
-                    <div className="flex flex-col w-[172px] text-grey-500 font-light">
+                    {/* <div className="flex gap-4 px-2 hover:cursor-pointer"></div> */}
+                    <div className="flex flex-col w-[172px] text-grey-500 font-light px-2">
                       <div className="text-[0.75rem]">
                         <span className="text-grey-300 font-semibold">
                           {video.description}
@@ -105,7 +105,7 @@ export default function Videos({ profile }: { profile: User }) {
               })}
             </div>
 
-            {pageCount > 1 && (
+            {/* {pageCount > 1 && (
               <div className="flex justify-end mt-[24px] px-[16px]">
                 <ReactPaginate
                   previousLabel="<"
@@ -130,7 +130,7 @@ export default function Videos({ profile }: { profile: User }) {
                   forcePage={parseInt(pageNum, 10)}
                 />
               </div>
-            )}
+            )} */}
           </div>
         </>
       )}
