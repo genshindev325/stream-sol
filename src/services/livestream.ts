@@ -2,48 +2,29 @@ import axios from "axios";
 import { API_CONFIG } from "../libs/constants";
 import { getAccessToken } from "@/libs/helpers";
 
-export const createRoom = async ({ title }: { title: string }) => {
-  const token = getAccessToken();
-  try {
-    const { data } = await axios.post(
-      `${API_CONFIG}/livestream/createRoom`,
-      { title },
-      {
-        headers: {
-          Authorization: "Bearer " + token,
-        },
-      }
-    );
-    return data;
-  } catch (error) {}
-};
-
 export const createLivestream = async ({
   title,
   description,
   text,
   link,
   thumbnail,
-  roomId,
 }: {
   title: string;
   description: string;
   text: string;
   link: string;
   thumbnail: string;
-  roomId: string;
 }) => {
   const token = getAccessToken();
   const { data } = await axios.post(
     `${API_CONFIG}/livestream`,
-    { title, description, text, link, views: 1, thumbnail, roomId },
+    { title, description, text, link, views: 1, thumbnail },
     {
       headers: {
         Authorization: "Bearer " + token,
       },
     }
   );
-  console.log("Data: ", data);
   return data;
 };
 

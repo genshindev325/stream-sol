@@ -24,17 +24,14 @@ export default function Main() {
   const fetchVideos = async () => {
     setLoading(true);
     try {
-      const { livestreams, count } = await getAllLivestreams(
-        pageNum.toString(),
-        search
-      );
-      console.log(">>Livestreams>>", livestreams, count);
+      const data = await getAllLivestreams(pageNum.toString(), search);
+      console.log("Livestreams >>>>> ", data);
       if (pageNum > 1) {
-        setLives([...lives, ...livestreams]);
+        setLivestreams([...livestreams, ...data.livestreams]);
       } else {
-        setLives(livestreams);
+        setLivestreams(data.livestreams);
       }
-      setCount(count);
+      setCount(data.count);
     } catch (err) {
       console.error(err);
     }

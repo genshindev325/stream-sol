@@ -2,25 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 import connectMongo from "@/libs/connect-mongo";
 import LivestreamModel from "@/models/livestream";
 import { HttpStatusCode } from "axios";
-import UserModel, { IUser } from "@/models/user";
+import UserModel from "@/models/user";
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
   const livestreamData = await request.json();
 
-  await connectMongo();
-
-  const creator = await UserModel.findOne({
-    publickey: userPk,
-  });
-  const livestream = new LivestreamModel({
-    creator,
-    ...livestreamData,
-  });
-
-  console.log("MongoDB", livestream);
-
   try {
+    const response = await fetch(
+      "https://api.huddle01.com/api/v1/create-room",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          title: livestreamData.title,
+        }),
+        headers: {
+          "Content-type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
+        },
+        cache: "no-cache",
+      }
+    );
+
+    const data = await response.json();
+    const roomId = data.data.roomId;
+
+    await connectMongo();
+
+    const creator = await UserModel.findOne({
+      publickey: userPk,
+    });
+
+    const livestream = new LivestreamModel({
+      ...livestreamData,
+      creator,
+      roomId,
+    });
+
     await livestream.save();
 
     return NextResponse.json(
@@ -29,7 +47,7 @@ export async function POST(request: Request) {
     );
   } catch (errors: any) {
     return NextResponse.json(
-      { livestream },
+      { livestream: null },
       { status: HttpStatusCode.BadRequest }
     );
   }
