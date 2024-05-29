@@ -1,24 +1,13 @@
+import { type NextRequest, NextResponse } from "next/server";
 import { AccessToken, Role } from "@huddle01/server-sdk/auth";
 import { Recorder } from "@huddle01/server-sdk/recorder";
 import { HttpStatusCode } from "axios";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const roomId = searchParams.get("roomId") as string;
+
   try {
-    const searchParams = request.nextUrl.searchParams;
-    // const publicKey = searchParams.get("publicKey");
-    // const { searchParams } = new URL(request.url);
-    const roomId = searchParams.get("roomId");
-
-    if (
-      !process.env.NEXT_PUBLIC_HUDDLE_PROJECT_ID &&
-      !process.env.NEXT_PUBLIC_HUDDLE_API_KEY
-    ) {
-      return NextResponse.json({
-        error: "NEXT_PUBLIC_PROJECT_ID and API_KEY are required",
-      });
-    }
-
     const recorder = new Recorder(
       process.env.NEXT_PUBLIC_HUDDLE_PROJECT_ID!,
       process.env.NEXT_PUBLIC_HUDDLE_API_KEY!
@@ -26,7 +15,7 @@ export async function GET(request: NextRequest) {
 
     const token = new AccessToken({
       apiKey: process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
-      roomId: roomId as string,
+      roomId: roomId,
       role: Role.BOT,
       permissions: {
         admin: true,
@@ -43,8 +32,7 @@ export async function GET(request: NextRequest) {
       },
       options: {
         metadata: {
-          // you can add any custom attributes here which you want to associate with the user
-          botId: Date.now(),
+          botId: roomId,
         },
       },
     });
@@ -56,11 +44,16 @@ export async function GET(request: NextRequest) {
       token: accessToken,
     });
 
-    console.log("recording", roomId, accessToken, recording);
+    console.log(`recording >>>>>
+      roomId: ${roomId}
+      accessToken: ${accessToken}
+      recording: ${recording.msg}`);
 
-    return NextResponse.json({ recording }, { status: HttpStatusCode.Ok });
+    return NextResponse.json(
+      { recording: null },
+      { status: HttpStatusCode.Ok }
+    );
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { recording: null },
       { status: HttpStatusCode.BadRequest }

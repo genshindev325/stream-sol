@@ -22,13 +22,12 @@ import { AutoConnectProvider, useAutoConnect } from "./AutoConnectProvider";
 import { AuthContextProvider } from "./AuthContextProvider";
 import { NetworkConfigurationProvider } from "./NetworkConfigurationProvider";
 import { RPC_ENDPOINT, HUDDLE_PROJECT_ID } from "@/libs/constants";
-import { LivestreamsContext, LivestreamsContextProvider } from "./LivestreamsContextProvider";
 
 const huddleClient = new HuddleClient({
   projectId: HUDDLE_PROJECT_ID,
   options: {
     activeSpeakers: {
-      size: 10,
+      size: 1,
     },
   },
 });
@@ -64,9 +63,7 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
         autoConnect={autoConnect}
       >
         <ReactUIWalletModalProviderDynamic>
-          <AuthContextProvider>
-            <LivestreamsContextProvider>{children}</LivestreamsContextProvider>
-          </AuthContextProvider>
+          <AuthContextProvider>{children}</AuthContextProvider>
         </ReactUIWalletModalProviderDynamic>
       </WalletProvider>
     </ConnectionProvider>

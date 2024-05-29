@@ -16,8 +16,7 @@ import { FullLoading, NoWallet } from "@/components/common";
 import uploadPic from "@/assets/svgs/upload.svg";
 
 /// Livestream service
-import { createLivestream, createRoom } from "@/services/livestream";
-import { getRoomAccessToken } from "@/services/room";
+import { createLivestream } from "@/services/livestream";
 
 export default function UploadVideo() {
   const [title, setTitle] = useState("");
@@ -54,28 +53,21 @@ export default function UploadVideo() {
     const urlPattern = /^(ftp|http|https):\/\/[^ "]+$/;
 
     if (title == "" || !regexTitle.test(title)) {
-      toast.error("A stream title must be non-empty and valid", {
+      toast.error("Stream title must be non-empty and valid", {
         duration: 3000,
       });
       return false;
     }
 
     if (text == "" || !regexTitle.test(text)) {
-      toast.error("A stream text must be non-empty and valid", {
+      toast.error("Promotional Text must be non-empty and valid", {
         duration: 3000,
       });
       return false;
     }
 
     if (link == "" || !urlPattern.test(link)) {
-      toast.error("A stream link must be non-empty and valid", {
-        duration: 3000,
-      });
-      return false;
-    }
-
-    if (thumbnailFile === null) {
-      toast.error("Thumbnail image must be valid", {
+      toast.error("Promotional link must be non-empty and valid", {
         duration: 3000,
       });
       return false;
@@ -89,20 +81,21 @@ export default function UploadVideo() {
     if (!isValid) {
       return;
     }
+    if (thumbnailFile === null) {
+      toast.error("Thumbnail image must be valid", {
+        duration: 3000,
+      });
+      return;
+    }
 
     setLoading(true);
     try {
-      const { roomId } = await createRoom({ title });
-
       const options = JSON.stringify({
         cidVersion: 1,
       });
 
       const imageFormData = new FormData();
-      if (thumbnailFile) {
-        // Perform a null check on thumbnailFile
-        imageFormData.append("file", thumbnailFile);
-      }
+      imageFormData.append("file", thumbnailFile);
       imageFormData.append("pinataOptions", options);
       const resImage = await axios.post(
         "https://api.pinata.cloud/pinning/pinFileToIPFS",
@@ -116,22 +109,23 @@ export default function UploadVideo() {
 
       const imageHashValue = resImage.data.IpfsHash;
 
-      toast.success("Successfully uploaded", { duration: 3000 });
-      const livestream = await createLivestream({
+      const { livestream } = await createLivestream({
         title,
         description,
         text,
         link,
         thumbnail: imageHashValue,
-        roomId,
       });
-      console.log(">>>>>>", livestream);
-      console.log(roomId);
-      router.push(`/livestream/${roomId}`);
-    } catch (err) {
-      setLoading(false);
-      toast.error("Failed to create a livestream", { duration: 3000 });
-      console.error(err);
+
+      toast.success("Successfully Created Livestream", { duration: 3000 });
+      router.push(`/livestream/${livestream.roomId}`);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 409) {
+        toast.error("You already created livestream.", { duration: 3000 });
+      } else {
+        toast.error("Failed to Create Livestream", { duration: 3000 });
+      }
     }
     setLoading(false);
   };
@@ -233,7 +227,7 @@ export default function UploadVideo() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
-                Stream Text*
+                Promotional Text*
               </div>
               <div className="border border-grey-800 px-4 rounded-lg">
                 <input
@@ -251,7 +245,7 @@ export default function UploadVideo() {
             </div>
             <div className="flex flex-col gap-2">
               <div className="text-grey-400 text-[0.875rem] sm:text-[1rem]">
-                Stream Link*
+                Promotional Link*
               </div>
               <div className="border border-grey-800 px-4 rounded-lg">
                 <input

@@ -33,9 +33,11 @@ export default function LayoutPage({
           setSiderVisible={setSiderVisible}
         />
         <div
-          className={`flex flex-col flex-1 md:ml-[280px] ${
-            siderVisible ? "ml-[280px] hidden md:block" : "ml-0"
-          }`}
+          className={
+            siderVisible
+              ? "hidden md:flex md:flex-col md:flex-1 md:ml-[280px]"
+              : "flex flex-col flex-1 ml-0 md:ml-[280px]"
+          }
         >
           {children}
         </div>

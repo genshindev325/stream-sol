@@ -11,19 +11,17 @@ import {
   usePeerIds,
   useRoom,
 } from "@huddle01/react/hooks";
-import { Inter } from "next/font/google";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import {
   endLivestream,
-  getLivestreamByRoomId,
   increaseViews,
   startRecording,
   stopRecording,
 } from "@/services/livestream";
 import AvatarComponent from "../common/AvatarComponent";
-import { FaDollarSign, FaStop, FaWindowClose } from "react-icons/fa";
+import { FaDollarSign, FaWindowClose } from "react-icons/fa";
 import {
   AiFillCamera,
   AiOutlineAudio,
@@ -32,12 +30,9 @@ import {
 } from "react-icons/ai";
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
 import { getRoomAccessToken } from "@/services/room";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { createArchievedstream } from "@/services/archievedstream";
 import { Role } from "@huddle01/server-sdk/auth";
 import toast from "react-hot-toast";
-
-const inter = Inter({ subsets: ["latin"] });
 
 type Props = {
   livestreamData: Livestream;
@@ -45,14 +40,11 @@ type Props = {
 
 export default function LiveStreamPage({ livestreamData }: Props) {
   const [displayName, setDisplayName] = useState<string>("");
-  const [token, setToken] = useState<string>("");
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [joining, setJoining] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const screenRef = useRef<HTMLVideoElement>(null);
-  const params = useParams<{ roomId: string }>();
-  const [isRecording, setIsRecording] = useState<boolean>(false);
   const { user } = useAuthContext();
-  const { publicKey: walletKey } = useWallet();
-  const [joining, setJoining] = useState<boolean>(false);
   const router = useRouter();
 
   const { joinRoom, state, closeRoom } = useRoom({
@@ -62,7 +54,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       updateMetadata({ displayName });
     },
     onPeerJoin: async (peer) => {
-      const response = await increaseViews(params.roomId);
+      const response = await increaseViews(livestreamData.roomId);
       console.log("onPeerJoin", peer, response);
     },
     onLeave: ({ reason }) => {
@@ -70,7 +62,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     },
   });
 
-  console.log("State: ", state);
   const { enableVideo, isVideoOn, stream, disableVideo } = useLocalVideo();
   const { enableAudio, disableAudio, isAudioOn } = useLocalAudio();
   const { startScreenShare, stopScreenShare, shareStream } =
@@ -91,20 +82,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     if (shareStream && screenRef.current) {
       screenRef.current.srcObject = shareStream;
     }
-    console.log("Share stream: ", shareStream);
   }, [shareStream]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const roomId = params.roomId;
-      const publicKey = user?.publickey! || walletKey?.toBase58()!;
-      console.log(publicKey);
-      const token = await getRoomAccessToken({ roomId, publicKey });
-      setToken(token);
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (state == "closed") {
@@ -114,10 +92,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       router.push(`/`);
     } else {
       const fetchData = async () => {
-        const roomId = params.roomId;
+        const roomId = livestreamData.roomId;
         if (!isRecording && state == "connected" && role == "host") {
           const status = await startRecording(roomId);
-          console.log(roomId, status);
           setIsRecording(true);
         }
       };
@@ -126,34 +103,79 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     }
   }, [state]);
 
+  const joinStream = async () => {
+    const roomId = livestreamData.roomId;
+    if (!user) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+    if (joining) {
+      return;
+    }
+    setJoining(true);
+    try {
+      const token = await getRoomAccessToken({
+        roomId,
+        publicKey: user.publickey,
+      });
+      setDisplayName(user.username || "");
+      await joinRoom({
+        roomId,
+        token,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    setJoining(false);
+  };
+
+  const endStream = async () => {
+    try {
+      console.log(isRecording);
+      if (isRecording) {
+        const status = await stopRecording(livestreamData.roomId);
+        console.log(livestreamData.roomId, status.data);
+        const data = await status.data;
+
+        // if (data.recording.recordingUrl) {
+        console.log(
+          livestreamData.roomId,
+          " Data: ",
+          data.recording.recordingUrl
+        );
+        closeRoom();
+        const archievedstream = await createArchievedstream({
+          title: livestreamData.title,
+          description: livestreamData.description!,
+          thumbnail: livestreamData.thumbnail,
+          roomId: livestreamData.roomId,
+          creator: livestreamData.creator.publickey,
+          video: data.recording.recordingUrl,
+        });
+        console.log("Archievedstream Data: ", archievedstream);
+        await endLivestream({
+          roomId: livestreamData.roomId,
+        });
+        router.push(`/profile/${user?.username}?tab=videos`);
+        // }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <>
       {state === "idle" || state === "left" ? (
-        <>
-          <div className="flex justify-center min-h-[95vh]">
-            <button
-              disabled={user ? false : true}
-              type="button"
-              className="w-[220px] h-[60px] flex justify-center items-center hover:cursor-pointer bg-primary-300 text-white text-lg rounded-lg my-auto"
-              onClick={async () => {
-                try {
-                  setDisplayName(user?.username || "");
-                  setJoining(true);
-                  console.log(user?.username, params.roomId, token);
-                  await joinRoom({
-                    roomId: params.roomId as string,
-                    token,
-                  });
-                  setJoining(false);
-                } catch (error) {
-                  setJoining(false);
-                }
-              }}
-            >
-              {joining ? "Joining..." : "Go to Livetream"}
-            </button>
-          </div>
-        </>
+        <div className="flex justify-center flex-1">
+          <button
+            type="button"
+            className="w-[220px] h-[60px] flex justify-center items-center hover:cursor-pointer bg-primary-300 text-white text-lg rounded-lg my-auto"
+            onClick={joinStream}
+          >
+            {joining ? "Joining..." : "Go to Livetream"}
+          </button>
+        </div>
       ) : (
         <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
           <div className="flex max-xl:flex-col gap-[16px] mx-auto mb-[32px] sm:mb-[48px]">
@@ -237,51 +259,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                           <button
                             type="button"
                             className="bg-red-500 p-2 mx-2 rounded-lg"
-                            onClick={async () => {
-                              try {
-                                console.log(isRecording);
-                                if (isRecording) {
-                                  const status = await stopRecording(
-                                    params.roomId
-                                  );
-                                  console.log(params.roomId, status.data);
-                                  const data = await status.data;
-
-                                  // if (data.recording.recordingUrl) {
-                                  if (1) {
-                                    console.log(
-                                      params.roomId,
-                                      " Data: ",
-                                      data.recording.recordingUrl
-                                    );
-                                    await closeRoom();
-                                    const archievedstream =
-                                      await createArchievedstream({
-                                        title: livestreamData.title,
-                                        description:
-                                          livestreamData.description!,
-                                        thumbnail: livestreamData.thumbnail,
-                                        roomId: livestreamData.roomId,
-                                        creator:
-                                          livestreamData.creator.publickey,
-                                        video: data.recording.recordingUrl,
-                                      });
-                                    console.log(
-                                      "Archievedstream Data: ",
-                                      archievedstream
-                                    );
-                                    await endLivestream({
-                                      roomId: livestreamData.roomId,
-                                    });
-                                    router.push(
-                                      `/profile/${user?.username}?tab=videos`
-                                    );
-                                  }
-                                }
-                              } catch (error) {
-                                console.log(error);
-                              }
-                            }}
+                            onClick={endStream}
                           >
                             <FaWindowClose />
                           </button>
@@ -304,7 +282,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                 {livestreamData?.title}
               </div>
               <div className="flex flex-col lg:flex-row justify-between gap-4 mt-4">
-                {/* <div className="flex flex-col justify-between sm:flex-row gap-2 sm:gap-4"> */}
                 <div className="flex gap-2 hover:cursor-pointer">
                   <AvatarComponent
                     avatar={livestreamData?.creator?.avatar}
@@ -346,12 +323,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                   "No description"
                 )}
               </div>
-
-              {/* <div className="mt-8 mb-32 grid gap-2 text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-          {peerIds.map((peerId) =>
-            peerId ? <RemotePeer key={peerId} peerId={peerId} /> : null
-          )}
-        </div> */}
             </div>
 
             {state === "connected" && <ChatBox />}
