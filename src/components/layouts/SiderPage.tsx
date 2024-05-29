@@ -45,15 +45,6 @@ export default function SiderPage({
   const { livestreams, setLivestreams } = useLivestreamsContext();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getAllLivestreams("1", "");
-      setLivestreams(data.livestreams);
-      console.log(">>LivestreamData>>", data);
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     const roomId = pathname.split("/")[2];
     if (selected == "livestream" && roomId) {
       setStreamPage(true);

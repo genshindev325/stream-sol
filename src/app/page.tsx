@@ -15,7 +15,6 @@ import videoPic from "@/assets/images/video.png";
 export default function Main() {
   const [pageNum, setPageNum] = useState(1);
   const [count, setCount] = useState(0);
-  const [lives, setLives] = useState<Array<any>>([]);
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
@@ -62,14 +61,14 @@ export default function Main() {
     return <PageLoading />;
   }
 
-  if (lives.length === 0) {
+  if (livestreams.length === 0) {
     return <NoComponent content="No Livestream" source={videoPic} />;
   }
 
   return (
     <div className="flex flex-col flex-1 p-[12px] sm:p-[16px]">
       <div className="flex flex-wrap justify-center md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
-        {lives.map((livestream, idx) => {
+        {livestreams.map((livestream, idx) => {
           return <Streamtile key={idx} livestream={livestream} />;
         })}
       </div>
