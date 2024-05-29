@@ -28,7 +28,6 @@ export const createArchievedstream = async ({
       },
     }
   );
-  console.log("Data: ", data);
   return data;
 };
 

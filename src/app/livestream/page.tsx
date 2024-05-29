@@ -48,18 +48,16 @@ export default function UploadVideo() {
   };
 
   const validateForm = () => {
-    const regexTitle = /^[A-Za-z0-9]+$/;
-    const regexLink = /^[a-zA-Z0-9\-_:.\/?=&"{}()]+$/;
     const urlPattern = /^(ftp|http|https):\/\/[^ "]+$/;
 
-    if (title == "" || !regexTitle.test(title)) {
+    if (title == "") {
       toast.error("Stream title must be non-empty and valid", {
         duration: 3000,
       });
       return false;
     }
 
-    if (text == "" || !regexTitle.test(text)) {
+    if (text == "") {
       toast.error("Promotional Text must be non-empty and valid", {
         duration: 3000,
       });

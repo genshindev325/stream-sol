@@ -7,14 +7,14 @@ import { useRouter } from "next/navigation";
 import ReactPaginate from "react-paginate";
 
 /// Custom
-import { NoComponent, PageLoading } from "@/components/common";
+import { NoComponent, PageLoading, NoWallet } from "@/components/common";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Archievedstream, User } from "@/libs/types";
+import { fetchArchievedstreams } from "@/services/archievedstream";
 
 /// Images
 import videoPic from "@/assets/images/video.png";
-import { fetchArchievedstreams } from "@/services/archievedstream";
 
 export default function Videos({ profile }: { profile: User }) {
   const [loading, setLoading] = useState(false);
@@ -42,7 +42,7 @@ export default function Videos({ profile }: { profile: User }) {
   }, [pageNum]);
 
   if (!user) {
-    return <NoComponent content="Connect Your Wallet" source={videoPic} />;
+    return <NoWallet />;
   }
 
   return (

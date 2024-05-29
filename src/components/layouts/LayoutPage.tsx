@@ -25,7 +25,7 @@ export default function LayoutPage({
   const [siderVisible, setSiderVisible] = useState<boolean>(false);
 
   return (
-    <main className="flex min-h-screen flex-col bg-background text-white">
+    <main className="flex min-h-dvh flex-col bg-background text-white">
       <HuddleProvider client={huddleClient}>
         <HeaderPage setSiderVisible={setSiderVisible} />
         <SiderPage
