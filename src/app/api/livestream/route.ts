@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios, { HttpStatusCode } from "axios";
 import connectMongo from "@/libs/connect-mongo";
-import LivestreamModel from "@/models/livestream";
 import UserModel from "@/models/user";
 import { HUDDLE_API_KEY } from "@/libs/constants";
+import LivestreamModel from "@/models/livestream";
+import ArchievedstreamModel from "@/models/archievedstream";
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
@@ -92,24 +93,43 @@ export async function GET(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const roomId = searchParams.get("roomId");
+  const video = searchParams.get("video");
 
-  await connectMongo();
+  try {
+    await connectMongo();
 
-  const livestream = await LivestreamModel.deleteOne({
-    roomId,
-  });
+    const livestream = await LivestreamModel.findOneAndDelete({
+      roomId,
+    });
 
-  if (!livestream) {
+    if (!livestream) {
+      return NextResponse.json(
+        { message: "Livestream Does Not Exist" },
+        { status: HttpStatusCode.NotFound }
+      );
+    }
+
+    const archievedstream = new ArchievedstreamModel({
+      title: livestream.title,
+      description: livestream?.description!,
+      thumbnail: livestream.thumbnail,
+      roomId: livestream.roomId,
+      creator: livestream.creator.publickey,
+      video,
+    });
+
+    await archievedstream.save();
+
     return NextResponse.json(
-      { message: "Livestream Does Not Exist" },
-      { status: HttpStatusCode.NotFound }
+      { Message: "Successfully deleted!" },
+      { status: HttpStatusCode.Ok }
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { Message: "Failed to delete" },
+      { status: HttpStatusCode.BadRequest }
     );
   }
-
-  return NextResponse.json(
-    { Message: "Successfully deleted!" },
-    { status: HttpStatusCode.Ok }
-  );
 }
 
 export async function PUT(request: NextRequest) {

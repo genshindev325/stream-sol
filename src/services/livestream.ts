@@ -28,10 +28,16 @@ export const createLivestream = async ({
   return data;
 };
 
-export const endLivestream = async ({ roomId }: { roomId: string }) => {
+export const endLivestream = async ({
+  roomId,
+  video,
+}: {
+  roomId: string;
+  video: string;
+}) => {
   const token = getAccessToken();
   const { data } = await axios.delete(
-    `${API_CONFIG}/livestream?roomId=${roomId}`,
+    `${API_CONFIG}/livestream?roomId=${roomId}&video=${video}`,
     {
       headers: {
         Authorization: "Bearer " + token,

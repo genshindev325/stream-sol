@@ -13,7 +13,22 @@ import {
 } from "@huddle01/react/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useAuthContext } from "@/contexts/AuthContextProvider";
+
+/// Built-in
+import { Role } from "@huddle01/server-sdk/auth";
+import toast from "react-hot-toast";
+
+/// Icons
+import { FaDollarSign, FaWindowClose } from "react-icons/fa";
+import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
+import {
+  AiFillCamera,
+  AiOutlineAudio,
+  AiOutlineAudioMuted,
+  AiOutlineCamera,
+} from "react-icons/ai";
+
+/// Custom
 import {
   decreaseViews,
   endLivestream,
@@ -21,20 +36,10 @@ import {
   startRecording,
   stopRecording,
 } from "@/services/livestream";
-import AvatarComponent from "../common/AvatarComponent";
-import { FaDollarSign, FaWindowClose } from "react-icons/fa";
-import {
-  AiFillCamera,
-  AiOutlineAudio,
-  AiOutlineAudioMuted,
-  AiOutlineCamera,
-} from "react-icons/ai";
-import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
+import { FullLoading, AvatarComponent, DonateModal } from "../common";
 import { getRoomAccessToken } from "@/services/room";
 import { createArchievedstream } from "@/services/archievedstream";
-import { Role } from "@huddle01/server-sdk/auth";
-import toast from "react-hot-toast";
-import { FullLoading } from "../common";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 type Props = {
   livestreamData: Livestream;
@@ -49,6 +54,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const screenRef = useRef<HTMLVideoElement>(null);
   const { user } = useAuthContext();
   const router = useRouter();
+  const [donated, setDonated] = useState<boolean>(false);
 
   const { joinRoom, state, closeRoom, leaveRoom } = useRoom({
     onJoin: async (room) => {
@@ -152,18 +158,19 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     }
 
     try {
-      closeRoom();
-      const archievedstream = await createArchievedstream({
-        title: livestreamData.title,
-        description: livestreamData.description!,
-        thumbnail: livestreamData.thumbnail,
-        roomId: livestreamData.roomId,
-        creator: livestreamData.creator.publickey,
-        video: data?.recording?.recordingUrl || "",
-      });
+      // const archievedstream = await createArchievedstream({
+      //   title: livestreamData.title,
+      //   description: livestreamData.description!,
+      //   thumbnail: livestreamData.thumbnail,
+      //   roomId: livestreamData.roomId,
+      //   creator: livestreamData.creator.publickey,
+      //   video: data?.recording?.recordingUrl || "",
+      // });
       await endLivestream({
         roomId: livestreamData.roomId,
+        video: data?.recording?.recordingUrl || "",
       });
+      closeRoom();
       router.push(`/profile/${user?.username}?tab=videos`);
     } catch (err) {
       console.log(err);
@@ -318,11 +325,11 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                     avatar={livestreamData.creator?.avatar!}
                     size={44}
                   />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col gap-[4px]">
                     <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
                       {livestreamData.creator.username}
                     </div>
-                    <div className="flex justify-center items-center text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light bg-grey-700 rounded-xl">
+                    <div className="flex justify-center items-center text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light bg-grey-700 rounded-xl px-[4px]">
                       <a href={livestreamData.link} target="_blank">
                         ${livestreamData.text}
                       </a>
@@ -330,7 +337,12 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                   </div>
                 </div>
                 {user?.publickey !== livestreamData.creator.publickey && (
-                  <div className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] sm:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold">
+                  <div
+                    className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] sm:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold"
+                    onClick={() => {
+                      setDonated(true);
+                    }}
+                  >
                     <FaDollarSign />
                     Donate
                   </div>
@@ -354,6 +366,17 @@ export default function LiveStreamPage({ livestreamData }: Props) {
             <ChatBox />
           </div>
         </div>
+      )}
+      {donated && (
+        <DonateModal
+          pk={livestreamData.creator.publickey}
+          name={livestreamData.creator.fullname}
+          username={livestreamData.creator.username}
+          avatar={livestreamData.creator.avatar!}
+          onClose={() => {
+            setDonated(false);
+          }}
+        />
       )}
     </>
   );
