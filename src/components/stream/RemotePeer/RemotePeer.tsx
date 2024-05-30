@@ -107,7 +107,7 @@ const RemotePeer = ({ peerId }: Props) => {
       )}
 
       {stream && (
-        <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
+        <div className="w-1/4 mx-auto absolute right-[0.25rem] bottom-[0.25rem]">
           <video
             ref={vidRef}
             controls

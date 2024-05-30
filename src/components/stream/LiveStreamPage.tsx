@@ -246,7 +246,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                     )}
 
                     {isVideoOn && (
-                      <div className="w-1/4 mx-auto absolute right-[1rem] bottom-[1rem]">
+                      <div className="w-1/4 mx-auto absolute right-[0.25rem] bottom-[0.25rem]">
                         <video
                           ref={videoRef}
                           className="aspect-video rounded-xl"
