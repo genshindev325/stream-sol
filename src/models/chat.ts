@@ -1,7 +1,6 @@
 import { models, model, Schema } from "mongoose";
-import { SoftDeleteDocument, SoftDeleteModel } from "mongoose-delete";
 
-export interface IChat extends SoftDeleteDocument {
+export interface IChat {
   livestreamId: string;
   roomId: string;
   sender: string;
@@ -47,8 +46,6 @@ export const ChatSchema = new Schema<IChat>(
   }
 );
 
-const ChatModel =
-  (models.Chat as SoftDeleteModel<IChat>) ||
-  model<SoftDeleteModel<IChat>>("Chat", ChatSchema);
+const ChatModel = models.Chat || model<IChat>("Chat", ChatSchema);
 
 export default ChatModel;

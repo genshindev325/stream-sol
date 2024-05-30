@@ -10,6 +10,7 @@ import {
   useLocalVideo,
   usePeerIds,
   useRoom,
+  useDataMessage,
 } from "@huddle01/react/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -30,15 +31,14 @@ import {
 
 /// Custom
 import {
-  decreaseViews,
   endLivestream,
   increaseViews,
+  decreaseViews,
   startRecording,
   stopRecording,
 } from "@/services/livestream";
 import { FullLoading, AvatarComponent, DonateModal } from "../common";
 import { getRoomAccessToken } from "@/services/room";
-import { createArchievedstream } from "@/services/archievedstream";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 type Props = {
@@ -72,12 +72,21 @@ export default function LiveStreamPage({ livestreamData }: Props) {
 
   const { role, updateMetadata, metadata } = useLocalPeer<TPeerMetadata>();
 
-  const { peerIds } = usePeerIds({
-    roles: [Role.HOST, Role.LISTENER],
-  });
+  // const { peerIds } = usePeerIds({
+  //   roles: [Role.HOST, Role.LISTENER],
+  // });
 
   const { peerIds: hostPeerIds } = usePeerIds({
     roles: [Role.HOST],
+  });
+
+  useDataMessage({
+    async onMessage(payload, from, label) {
+      if (label === "server-message") {
+        const { s3URL } = JSON.parse(payload);
+        console.log(`Your recording: ${s3URL}`);
+      }
+    },
   });
 
   useEffect(() => {
@@ -105,18 +114,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       }
       router.push(`/`);
     }
-
-    // else {
-    //   const fetchData = async () => {
-    //     const roomId = livestreamData.roomId;
-    //     if (!isRecording && state == "connected" && role == "host") {
-    //       const status = await startRecording(roomId);
-    //       setIsRecording(true);
-    //     }
-    //   };
-
-    //   fetchData();
-    // }
   }, [state]);
 
   const joinStream = async () => {
@@ -139,6 +136,11 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         roomId,
         token,
       });
+
+      if (!livestreamData.recording) {
+        await startRecording(livestreamData.roomId);
+        setIsRecording(true);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -148,33 +150,26 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const endStream = async () => {
     setLoading(true);
     let data: any;
-    if (isRecording) {
+    if (livestreamData.recording || isRecording) {
       try {
         const status = await stopRecording(livestreamData.roomId);
         data = await status.data;
+        console.log("Recording URL >>>>>>>>>>>>>>>>> \n", data);
       } catch (err) {
         console.log(err);
       }
     }
 
-    try {
-      // const archievedstream = await createArchievedstream({
-      //   title: livestreamData.title,
-      //   description: livestreamData.description!,
-      //   thumbnail: livestreamData.thumbnail,
-      //   roomId: livestreamData.roomId,
-      //   creator: livestreamData.creator.publickey,
-      //   video: data?.recording?.recordingUrl || "",
-      // });
-      await endLivestream({
-        roomId: livestreamData.roomId,
-        video: data?.recording?.recordingUrl || "",
-      });
-      closeRoom();
-      router.push(`/profile/${user?.username}?tab=videos`);
-    } catch (err) {
-      console.log(err);
-    }
+    // try {
+    //   await endLivestream({
+    //     roomId: livestreamData.roomId,
+    //     video: data?.recording?.recordingUrl || "",
+    //   });
+    //   closeRoom();
+    //   router.push(`/profile/${user?.username}?tab=videos`);
+    // } catch (err) {
+    //   console.log(err);
+    // }
     setLoading(false);
   };
 

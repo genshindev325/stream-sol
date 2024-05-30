@@ -17,15 +17,17 @@ export async function GET(request: Request) {
     const publicKey = searchParams.get("publicKey") as string;
 
     if (!publicKey || !roomId) {
-      return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
+      return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
     }
 
+    console.log("-----------------------------------");
+    console.log(publicKey, roomId);
     const livestream = await LivestreamModel.findOne({
       roomId,
     });
 
-    if(!livestream) {
-      return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
+    if (!livestream) {
+      return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
     }
 
     const creator = livestream.creator;
@@ -85,6 +87,6 @@ export async function GET(request: Request) {
     const token: string = await accessToken.toJwt();
     return NextResponse.json({ token }, { status: HttpStatusCode.Ok });
   } catch (errors: any) {
-    return NextResponse.json({ }, { status: HttpStatusCode.BadRequest });
+    return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
   }
 }

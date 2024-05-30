@@ -1,9 +1,8 @@
 import { models, model, Schema, Types, ObjectId } from "mongoose";
-import { PublicKey } from "@solana/web3.js";
 
 export interface IAlike {
   user: string;
-  announcement: ObjectId;
+  announcementId: ObjectId;
   liked: boolean;
 }
 
@@ -14,17 +13,14 @@ export const AlikeSchema = new Schema<IAlike>(
       type: String,
       required: true,
       index: true,
-      validate: {
-        validator: function (value: string) {
-          const key = new PublicKey(value);
-          return PublicKey.isOnCurve(key);
-        },
-        message: "Invalid public key",
-      },
     },
 
-    /// Announcement Content
-    announcement: { type: Types.ObjectId, required: true, ref: "Announcement" },
+    /// Announcement Object Id
+    announcementId: {
+      type: Types.ObjectId,
+      required: true,
+      ref: "Announcement",
+    },
 
     /// Likes
     liked: {

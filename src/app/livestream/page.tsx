@@ -11,12 +11,10 @@ import toast from "react-hot-toast";
 /// Custom Import
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { FullLoading, NoWallet } from "@/components/common";
+import { createLivestream } from "@/services/livestream";
 
 /// Images
 import uploadPic from "@/assets/svgs/upload.svg";
-
-/// Livestream service
-import { createLivestream } from "@/services/livestream";
 
 export default function UploadVideo() {
   const [title, setTitle] = useState("");

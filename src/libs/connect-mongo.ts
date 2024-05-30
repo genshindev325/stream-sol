@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import UserModel from "@/models/user";
 import FollowModel from "@/models/follow";
+import AnnouncementModel from "@/models/announcement";
+import AlikeModel from "@/models/alike";
 
 const MONGO_URI = process.env.MONGODB_URI as string;
 
@@ -31,8 +33,6 @@ async function connectMongo() {
     throw e;
   }
 
-  console.log("Connected To MongoDB");
-
   UserModel.watch([], { fullDocument: "updateLookup" }).on(
     "change",
     async (change) => {
@@ -58,6 +58,17 @@ async function connectMongo() {
             },
           }
         );
+      }
+    }
+  );
+
+  AnnouncementModel.watch([], { fullDocument: "updateLookup" }).on(
+    "change",
+    async (change) => {
+      if (change.operationType === "delete") {
+        await AlikeModel.deleteMany({
+          announcementId: change.documentKey._id,
+        });
       }
     }
   );

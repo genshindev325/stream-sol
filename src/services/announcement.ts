@@ -9,7 +9,7 @@ export const fetchAnnouncements = async (
   page: Number
 ) => {
   const { data } = await axios.get(
-    `${API_CONFIG}/announcement?publicKey=${publicKey}&user=${user}&page=${page}`
+    `${API_CONFIG}/announcement?pubkey=${publicKey}&user=${user}&page=${page}`
   );
   return data;
 };

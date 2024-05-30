@@ -25,7 +25,6 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 /// Images
 import announcementPic from "@/assets/images/announcement.png";
-import videoPic from "@/assets/images/video.png";
 
 export default function Announcement({ profile }: { profile: User }) {
   const [content, setContent] = useState("");
@@ -71,10 +70,11 @@ export default function Announcement({ profile }: { profile: User }) {
   };
 
   const fetchData = async () => {
-    const pk = publicKey ? publicKey?.toBase58() : "";
+    const pk = publicKey?.toBase58()!;
     const data = await fetchAnnouncements(pk, profile.publickey, pageNum);
     setCount(data.count);
 
+    console.log(data)
     if (pageNum === 1) {
       setAnnouncements(data.announcements);
     } else {
@@ -132,107 +132,96 @@ export default function Announcement({ profile }: { profile: User }) {
     })();
   }, [pageNum, profile, publicKey]);
 
-  useEffect(() => {
-    if (announcements.length > ITEMS_PER_PAGE) {
-      const documentHeight = document.documentElement.scrollHeight;
-      const windowHeight = window.innerHeight;
-
-      window.scrollTo(0, documentHeight - windowHeight - 200);
-    }
-  }, [announcements]);
-
   if (!user) {
     return <NoWallet />;
   }
 
+  if (loading) {
+    return <PageLoading />;
+  }
+
   return (
-    <div className="relative flex flex-col flex-1 gap-4 text-[0.875rem] sm:text-[1rem]">
-      {loading ? (
-        <PageLoading />
+    <div className="flex flex-col flex-1 gap-4 text-[0.875rem] sm:text-[1rem]">
+      {publicKey?.toBase58() === profile.publickey && (
+        <div className="relative border border-grey-800 rounded-lg p-2">
+          <textarea
+            spellCheck={false}
+            value={content}
+            onChange={(e) => {
+              const content = e.target.value;
+              setContent(content);
+            }}
+            placeholder="Type here"
+            className="text-grey-300 placeholder:text-grey-800 indent-2 h-[120px] w-full text-[0.875rem] sm:text-[1rem] bg-transparent border-none focus:outline-none focus:[box-shadow:none"
+          />
+          <div
+            className="w-[80px] lg:w-[100px] h-[32px] lg:h-[36px] bg-primary-300 text-[0.875rem] sm:text-[1rem] rounded-md flex justify-center items-center hover:cursor-pointer absolute bottom-[12px] left-[12px]"
+            onClick={send}
+          >
+            Submit
+          </div>
+        </div>
+      )}
+      {announcements.length === 0 ? (
+        <NoComponent content="No Announcements" source={announcementPic} />
       ) : (
-        <>
-          {publicKey?.toBase58() === profile.publickey && (
-            <div className="relative border border-grey-800 rounded-lg p-2">
-              <textarea
-                spellCheck={false}
-                value={content}
-                onChange={(e) => {
-                  const content = e.target.value;
-                  setContent(content);
-                }}
-                placeholder="Type here"
-                className="text-grey-300 placeholder:text-grey-800 indent-2 h-[120px] w-full text-[0.875rem] sm:text-[1rem] bg-transparent border-none focus:outline-none focus:[box-shadow:none"
-              />
-              <div
-                className="w-[80px] lg:w-[100px] h-[32px] lg:h-[36px] bg-primary-300 text-[0.875rem] sm:text-[1rem] rounded-md flex justify-center items-center hover:cursor-pointer absolute bottom-[12px] left-[12px]"
-                onClick={send}
-              >
-                Submit
+        announcements.map((announcement, idx) => {
+          return (
+            <div
+              className="flex flex-col w-full py-[8px] text-grey-300"
+              key={idx}
+            >
+              <div className="text-[0.875rem] sm:text-[1rem]">
+                {profile.fullname}
+                <span className="pl-[16px] text-[0.75rem] sm:text-[0.875rem] text-grey-500">
+                  {formatTime(announcement.createdAt)}
+                </span>
+              </div>
+              <div className="">{announcement.content}</div>
+              <div className="mt-[8px] gap-[4px] flex items-center">
+                {announcement.userLiked === AlikeEnum.Like ? (
+                  <BiSolidLike
+                    size={16}
+                    className="hover:cursor-pointer"
+                    onClick={() => {
+                      doLike(announcement.id);
+                    }}
+                  />
+                ) : (
+                  <BiLike
+                    size={16}
+                    className="hover:cursor-pointer"
+                    onClick={() => {
+                      doLike(announcement.id);
+                    }}
+                  />
+                )}
+                <span>{announcement.likes}</span>
+
+                {announcement.userLiked === AlikeEnum.Dislike ? (
+                  <BiSolidDislike
+                    size={16}
+                    className="ml-[16px] hover:cursor-pointer"
+                    onClick={() => {
+                      doDislike(announcement.id);
+                    }}
+                  />
+                ) : (
+                  <BiDislike
+                    size={16}
+                    className="ml-[16px] hover:cursor-pointer"
+                    onClick={() => {
+                      doDislike(announcement.id);
+                    }}
+                  />
+                )}
+                <span>{announcement.dislikes}</span>
               </div>
             </div>
-          )}
-          {announcements.length === 0 ? (
-            <NoComponent content="No Announcements" source={announcementPic} />
-          ) : (
-            announcements.map((announcement, idx) => {
-              return (
-                <div
-                  className="flex flex-col w-full py-[8px] text-grey-300"
-                  key={idx}
-                >
-                  <div className="text-[0.875rem] sm:text-[1rem]">
-                    {profile.fullname}
-                    <span className="pl-[16px] text-[0.75rem] sm:text-[0.875rem] text-grey-500">
-                      {formatTime(announcement.createdAt)}
-                    </span>
-                  </div>
-                  <div className="">{announcement.content}</div>
-                  <div className="mt-[8px] gap-[4px] flex items-center">
-                    {announcement.userLiked === AlikeEnum.Like ? (
-                      <BiSolidLike
-                        size={16}
-                        className="hover:cursor-pointer"
-                        onClick={() => {
-                          doLike(announcement.id);
-                        }}
-                      />
-                    ) : (
-                      <BiLike
-                        size={16}
-                        className="hover:cursor-pointer"
-                        onClick={() => {
-                          doLike(announcement.id);
-                        }}
-                      />
-                    )}
-                    <span>{announcement.likes}</span>
-
-                    {announcement.userLiked === AlikeEnum.Dislike ? (
-                      <BiSolidDislike
-                        size={16}
-                        className="ml-[16px] hover:cursor-pointer"
-                        onClick={() => {
-                          doDislike(announcement.id);
-                        }}
-                      />
-                    ) : (
-                      <BiDislike
-                        size={16}
-                        className="ml-[16px] hover:cursor-pointer"
-                        onClick={() => {
-                          doDislike(announcement.id);
-                        }}
-                      />
-                    )}
-                    <span>{announcement.dislikes}</span>
-                  </div>
-                </div>
-              );
-            })
-          )}
-          {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
-        </>
+          );
+        })
       )}
+      {pageNum * ITEMS_PER_PAGE < count && <LoadMore showMore={showMore} />}
     </div>
   );
 }

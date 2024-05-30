@@ -1,18 +1,15 @@
-import exp from "constants";
 import { models, model, Schema } from "mongoose";
-import { SoftDeleteDocument, SoftDeleteModel } from "mongoose-delete";
-import { IUser, UserSchema } from "./user";
 
-export interface IArchievedstream extends SoftDeleteDocument {
+export interface IVideo {
   title: string;
   description?: string;
   thumbnail: string;
   creator: string;
   roomId: string;
-  video?: string;
+  url: string;
 }
 
-export const ArchievedstreamSchema = new Schema<IArchievedstream>(
+export const VideoSchema = new Schema<IVideo>(
   {
     /// Title
     title: {
@@ -41,15 +38,10 @@ export const ArchievedstreamSchema = new Schema<IArchievedstream>(
       required: true,
     },
 
-    /// Huddle Room Id
-    roomId: {
+    /// Saved recording video url
+    url: {
       type: String,
       required: true,
-    },
-
-    /// Saved recording video url
-    video: {
-      type: String,
     },
   },
   {
@@ -65,11 +57,6 @@ export const ArchievedstreamSchema = new Schema<IArchievedstream>(
   }
 );
 
-const ArchievedstreamModel =
-  (models.Archievedstream as SoftDeleteModel<IArchievedstream>) ||
-  model<SoftDeleteModel<IArchievedstream>>(
-    "Archievedstream",
-    ArchievedstreamSchema
-  );
+const VideoModel = models.Video || model<IVideo>("Video", VideoSchema);
 
-export default ArchievedstreamModel;
+export default VideoModel;

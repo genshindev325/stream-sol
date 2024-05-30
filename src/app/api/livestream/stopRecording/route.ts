@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { Recorder } from "@huddle01/server-sdk/recorder";
 import { HttpStatusCode } from "axios";
+import LivestreamModel from "@/models/livestream";
+import connectMongo from "@/libs/connect-mongo";
+import { HUDDLE_API_KEY, HUDDLE_PROJECT_ID } from "@/libs/constants";
 
 interface Recordings {
   id: string;
@@ -10,18 +13,31 @@ interface Recordings {
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const roomId = searchParams.get("roomId");
+  const roomId = searchParams.get("roomId") as string;
 
   try {
-    const recorder = new Recorder(
-      process.env.NEXT_PUBLIC_HUDDLE_PROJECT_ID!,
-      process.env.NEXT_PUBLIC_HUDDLE_API_KEY!
-    );
+    await connectMongo();
+
+    const livestream = await LivestreamModel.findOne({
+      roomId,
+    });
+
+    if (!livestream || livestream.recording === false) {
+      return NextResponse.json(
+        { recording: null },
+        { status: HttpStatusCode.BadRequest }
+      );
+    }
+
+    const recorder = new Recorder(HUDDLE_PROJECT_ID, HUDDLE_API_KEY);
+
+    console.log("end -----------------------------------------");
 
     const recording = await recorder.stop({
-      roomId: roomId as string,
+      roomId,
     });
-    console.log("recording", roomId, recording);
+
+    console.log(recording);
 
     const { msg } = recording;
 
@@ -30,7 +46,7 @@ export async function GET(request: NextRequest) {
         "https://api.huddle01.com/api/v1/get-recordings",
         {
           headers: {
-            "x-api-key": process.env.NEXT_PUBLIC_HUDDLE_API_KEY!,
+            "x-api-key": HUDDLE_API_KEY,
           },
         }
       );
@@ -38,7 +54,8 @@ export async function GET(request: NextRequest) {
 
       const { recordings } = data as { recordings: Recordings[] };
 
-      console.log(recordings);
+      livestream.recording = false;
+      await livestream.save();
 
       return NextResponse.json(
         { recording: recordings[0] },
@@ -46,9 +63,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ recording }, { status: HttpStatusCode.Ok });
+    return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
   } catch (error) {
-    console.log(error);
-    return NextResponse.json({ recording: null }, { status: HttpStatusCode.BadRequest });
+    return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
   }
 }

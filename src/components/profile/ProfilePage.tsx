@@ -16,15 +16,14 @@ import { useWallet } from "@solana/wallet-adapter-react";
 /// Custom Import
 import Announcement from "./Announcement";
 import Followers from "./Followers";
-import { FullLoading } from "@/components/common";
+import Videos from "./Videos";
+import { FullLoading, DonateModal } from "@/components/common";
 import { addressShow, formatK } from "@/libs/helpers";
 import { isFollower, follow } from "@/services/profile";
+import { User } from "@/libs/types";
 
 /// Images
 import userPic from "@/assets/svgs/user.svg";
-import { User } from "@/libs/types";
-import Videos from "./Videos";
-import DonateModal from "./DonateModal";
 
 type Props = {
   profile: User;
@@ -32,7 +31,7 @@ type Props = {
 
 export default function ProfilePage({ profile }: Props) {
   const searchParams = useSearchParams();
-  const tab = searchParams.get("tab") || "";
+  const tab = searchParams.get("tab") as string;
   const pathname = usePathname();
   const router = useRouter();
   const { publicKey } = useWallet();

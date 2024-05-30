@@ -1,11 +1,7 @@
 import { models, model, Schema } from "mongoose";
-import MongooseDelete, {
-  SoftDeleteDocument,
-  SoftDeleteModel,
-} from "mongoose-delete";
 import { PublicKey } from "@solana/web3.js";
 
-export interface IUser extends SoftDeleteDocument {
+export interface IUser {
   firstname: string;
   lastname?: string;
   username: string;
@@ -32,13 +28,6 @@ export const UserSchema = new Schema<IUser>(
       type: String,
       required: true,
       index: true,
-      validate: {
-        validator: function (value: string) {
-          const key = new PublicKey(value);
-          return PublicKey.isOnCurve(key);
-        },
-        message: "Invalid public key",
-      },
     },
 
     /// First Name
@@ -66,31 +55,25 @@ export const UserSchema = new Schema<IUser>(
     followers: {
       type: Number,
       default: 0,
-      validate: {
-        validator: function (value: number) {
-          return Number.isInteger(value) && value >= 0;
-        },
-        message: "Followers must be greater than or equal to 0",
-      },
     },
 
     /// Followings
     followings: {
       type: Number,
       default: 0,
-      validate: {
-        validator: function (value: number) {
-          return Number.isInteger(value) && value >= 0;
-        },
-        message: "Followings must be greater than or equal to 0",
-      },
     },
 
     /// Avatar
-    avatar: String,
+    avatar: {
+      type: String,
+      required: false,
+    },
 
     /// Banner
-    banner: String,
+    banner: {
+      type: String,
+      required: false,
+    },
   },
   {
     timestamps: true,
@@ -102,13 +85,6 @@ export const UserSchema = new Schema<IUser>(
         delete ret._id;
       },
     },
-    // toObject: {
-    //   versionKey: false,
-    //   transform: (_, ret) => {
-    //     ret.id = ret._id.toString();
-    //     delete ret._id;
-    //   },
-    // },
   }
 );
 
@@ -116,14 +92,6 @@ UserSchema.virtual("fullname").get(function () {
   return `${this.firstname} ${this.lastname}`;
 });
 
-UserSchema.plugin(MongooseDelete, {
-  overrideMethods: "all",
-  deletedBy: true,
-  deletedByType: String,
-});
-
-const UserModel =
-  (models.User as SoftDeleteModel<IUser>) ||
-  model<SoftDeleteModel<IUser>>("User", UserSchema);
+const UserModel = models.User || model<IUser>("User", UserSchema);
 
 export default UserModel;

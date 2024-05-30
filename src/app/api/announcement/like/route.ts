@@ -6,32 +6,31 @@ import AlikeModel from "@/models/alike";
 
 export async function POST(request: NextRequest) {
   const userPk = request.headers.get("user");
-
   const searchParams = request.nextUrl.searchParams;
-  const id = searchParams.get("id");
+  const id = searchParams.get("id") as string;
   const liked = searchParams.get("liked") === "true";
 
-  await connectMongo();
-
-  const announcement = await AnnouncementModel.findById(id);
-
-  if (!announcement) {
-    return NextResponse.json(
-      { message: "Announcement Does Not Exist" },
-      { status: HttpStatusCode.NotFound }
-    );
-  }
-
   try {
+    await connectMongo();
+
+    const announcement = await AnnouncementModel.findById(id);
+
+    if (!announcement) {
+      return NextResponse.json(
+        { message: "Announcement Does Not Exist" },
+        { status: HttpStatusCode.NotFound }
+      );
+    }
+
     const alike = await AlikeModel.findOne({
-      announcement: announcement._id,
+      announcementId: announcement.id,
       user: userPk,
     });
 
     if (alike) {
       if (alike.liked === liked) {
         await AlikeModel.deleteOne({
-          announcement: announcement._id,
+          announcementId: announcement.id,
           user: userPk,
         });
         if (liked) {
@@ -53,7 +52,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       const newAlike = new AlikeModel({
-        announcement: announcement._id,
+        announcementId: announcement.id,
         user: userPk,
         liked,
       });
@@ -73,7 +72,6 @@ export async function POST(request: NextRequest) {
       { status: HttpStatusCode.Created }
     );
   } catch (errors: any) {
-    console.log(errors);
     return NextResponse.json({ errors }, { status: HttpStatusCode.BadRequest });
   }
 }

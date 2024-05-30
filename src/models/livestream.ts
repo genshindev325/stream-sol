@@ -1,12 +1,7 @@
-import exp from "constants";
 import { models, model, Schema } from "mongoose";
-import MongooseDelete, {
-  SoftDeleteDocument,
-  SoftDeleteModel,
-} from "mongoose-delete";
 import { IUser, UserSchema } from "./user";
 
-export interface ILivestream extends SoftDeleteDocument {
+export interface ILivestream {
   title: string;
   description?: string;
   thumbnail: string;
@@ -15,6 +10,7 @@ export interface ILivestream extends SoftDeleteDocument {
   views: number;
   creator: IUser;
   roomId: string;
+  recording: boolean;
 }
 
 export const LivestreamSchema = new Schema<ILivestream>(
@@ -23,7 +19,6 @@ export const LivestreamSchema = new Schema<ILivestream>(
     title: {
       type: String,
       required: true,
-      index: true,
       max: 100,
     },
 
@@ -43,16 +38,19 @@ export const LivestreamSchema = new Schema<ILivestream>(
     /// Text
     text: {
       type: String,
+      required: true,
     },
 
     /// Link
     link: {
       type: String,
+      required: true,
     },
 
     /// Views
     views: {
       type: Number,
+      required: true,
       default: 1,
     },
 
@@ -66,6 +64,13 @@ export const LivestreamSchema = new Schema<ILivestream>(
     roomId: {
       type: String,
       required: true,
+      index: true,
+    },
+
+    recording: {
+      type: Boolean,
+      required: true,
+      default: false,
     },
   },
   {
@@ -82,7 +87,6 @@ export const LivestreamSchema = new Schema<ILivestream>(
 );
 
 const LivestreamModel =
-  (models.Livestream as SoftDeleteModel<ILivestream>) ||
-  model<SoftDeleteModel<ILivestream>>("Livestream", LivestreamSchema);
+  models.Livestream || model<ILivestream>("Livestream", LivestreamSchema);
 
 export default LivestreamModel;

@@ -10,8 +10,8 @@ import ReactPaginate from "react-paginate";
 import { NoComponent, PageLoading, NoWallet } from "@/components/common";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { Archievedstream, User } from "@/libs/types";
-import { fetchArchievedstreams } from "@/services/archievedstream";
+import { Video, User } from "@/libs/types";
+import { fetchVideos } from "@/services/video";
 
 /// Images
 import videoPic from "@/assets/images/video.png";
@@ -20,18 +20,18 @@ export default function Videos({ profile }: { profile: User }) {
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
   const [pageNum, setPageNum] = useState("1");
-  const [videos, setVideos] = useState<Array<Archievedstream>>([]);
+  const [videos, setVideos] = useState<Array<Video>>([]);
   const { user } = useAuthContext();
   const router = useRouter();
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await fetchArchievedstreams({
+      const data = await fetchVideos({
         publicKey: profile.publickey,
         pageNum: pageNum,
       });
-      setVideos(data.archievedstreams);
+      setVideos(data.videos);
       setPageCount(Math.ceil(data.count / ITEMS_PER_PAGE));
     } catch (err) {}
     setLoading(false);
