@@ -234,7 +234,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
             <div className="flex flex-col grow gap-[16px] m-[10px]">
               {role == Role.HOST ? (
                 <>
-                  <div className="mx-auto relative aspect-video rounded-xl w-[368px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] border-grey-500 border-1 bg-grey-700">
+                  <div className="mx-auto relative aspect-video rounded-xl w-[368px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] bg-grey-700">
                     {shareStream && (
                       <video
                         ref={screenRef}
