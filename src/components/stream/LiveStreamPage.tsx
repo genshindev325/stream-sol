@@ -98,17 +98,19 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         toast.success("This livestream has been closed!", { duration: 3000 });
       }
       router.push(`/`);
-    } else {
-      const fetchData = async () => {
-        const roomId = livestreamData.roomId;
-        if (!isRecording && state == "connected" && role == "host") {
-          const status = await startRecording(roomId);
-          setIsRecording(true);
-        }
-      };
-
-      fetchData();
     }
+
+    // else {
+    //   const fetchData = async () => {
+    //     const roomId = livestreamData.roomId;
+    //     if (!isRecording && state == "connected" && role == "host") {
+    //       const status = await startRecording(roomId);
+    //       setIsRecording(true);
+    //     }
+    //   };
+
+    //   fetchData();
+    // }
   }, [state]);
 
   const joinStream = async () => {
@@ -139,27 +141,32 @@ export default function LiveStreamPage({ livestreamData }: Props) {
 
   const endStream = async () => {
     setLoading(true);
-    try {
-      if (isRecording) {
+    let data: any;
+    if (isRecording) {
+      try {
         const status = await stopRecording(livestreamData.roomId);
-        const data = await status.data;
-
-        closeRoom();
-        const archievedstream = await createArchievedstream({
-          title: livestreamData.title,
-          description: livestreamData.description!,
-          thumbnail: livestreamData.thumbnail,
-          roomId: livestreamData.roomId,
-          creator: livestreamData.creator.publickey,
-          video: data.recording.recordingUrl,
-        });
-        await endLivestream({
-          roomId: livestreamData.roomId,
-        });
-        router.push(`/profile/${user?.username}?tab=videos`);
+        data = await status.data;
+      } catch (err) {
+        console.log(err);
       }
-    } catch (error) {
-      console.log(error);
+    }
+
+    try {
+      closeRoom();
+      const archievedstream = await createArchievedstream({
+        title: livestreamData.title,
+        description: livestreamData.description!,
+        thumbnail: livestreamData.thumbnail,
+        roomId: livestreamData.roomId,
+        creator: livestreamData.creator.publickey,
+        video: data?.recording?.recordingUrl || "",
+      });
+      await endLivestream({
+        roomId: livestreamData.roomId,
+      });
+      router.push(`/profile/${user?.username}?tab=videos`);
+    } catch (err) {
+      console.log(err);
     }
     setLoading(false);
   };
@@ -227,18 +234,12 @@ export default function LiveStreamPage({ livestreamData }: Props) {
             <div className="flex flex-col grow gap-[16px] m-[10px]">
               {role == Role.HOST ? (
                 <>
-                  <div className="mx-auto relative">
-                    {shareStream ? (
+                  <div className="mx-auto relative aspect-video rounded-xl w-[368px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] border-grey-500 border-1 bg-grey-700">
+                    {shareStream && (
                       <video
                         ref={screenRef}
-                        className="aspect-video rounded-xl lg:w-[800px]"
-                        autoPlay
-                        muted
-                      />
-                    ) : (
-                      <video
-                        ref={screenRef}
-                        className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500"
+                        className="aspect-video rounded-xl w-full"
+                        controls
                         autoPlay
                         muted
                       />
@@ -249,6 +250,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                         <video
                           ref={videoRef}
                           className="aspect-video rounded-xl"
+                          controls
                           autoPlay
                           muted
                         />
@@ -320,7 +322,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                     <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
                       {livestreamData.creator.username}
                     </div>
-                    <div className="text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light">
+                    <div className="flex justify-center items-center text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light bg-grey-700 rounded-xl">
                       <a href={livestreamData.link} target="_blank">
                         ${livestreamData.text}
                       </a>

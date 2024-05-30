@@ -77,7 +77,7 @@ function ChatBox() {
   };
 
   return (
-    <div className="relative w-full xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh] ">
+    <div className="relative w-full xl:w-[280px] 2xl:w-[400px] border border-grey-800 flex flex-col max-xl:h-[300px] h-[85vh] ">
       <h1 className="text-center text-2xl my-2 border-b border-grey-800">
         Chat Room
       </h1>

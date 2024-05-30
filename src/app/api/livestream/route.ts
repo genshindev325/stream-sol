@@ -34,7 +34,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log("-----------------------------------------");
     const { data } = await axios.post(
       "https://api.huddle01.com/api/v1/create-room",
       {
@@ -49,7 +48,7 @@ export async function POST(request: Request) {
     );
 
     const roomId = data.data.roomId;
-    console.log("-----------------------------------------", roomId);
+
     const livestream = new LivestreamModel({
       ...livestreamData,
       creator,
@@ -132,20 +131,17 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    let views = -1;
+    let views = livestream.views - 1;
     if (inc === "1") {
-      views = 1;
+      views = livestream.views + 1;
     }
 
-    const result = await LivestreamModel.updateOne(
-      { roomId },
-      { $inc: { views } }
-    );
+    if (views >= 0) {
+      livestream.views = views;
+      await livestream.save();
+    }
 
-    return NextResponse.json(
-      { livestream: result },
-      { status: HttpStatusCode.Ok }
-    );
+    return NextResponse.json({ livestream }, { status: HttpStatusCode.Ok });
   } catch (errors: any) {
     return NextResponse.json({ status: HttpStatusCode.NotModified });
   }
