@@ -24,6 +24,7 @@ import { isFollower, follow } from "@/services/profile";
 import userPic from "@/assets/svgs/user.svg";
 import { User } from "@/libs/types";
 import Videos from "./Videos";
+import DonateModal from "./DonateModal";
 
 type Props = {
   profile: User;
@@ -243,17 +244,17 @@ export default function ProfilePage({ profile }: Props) {
         )}
       </div>
 
-      {/* {donated && (
+      {donated && (
         <DonateModal
-          pk={pk}
-          name={name}
-          username={username}
-          avatar={avatar}
+          pk={profile.publickey}
+          name={profile.fullname}
+          username={profile.username}
+          avatar={profile.avatar!}
           onClose={() => {
             setDonated(false);
           }}
         />
-      )} */}
+      )}
     </div>
   );
 }
