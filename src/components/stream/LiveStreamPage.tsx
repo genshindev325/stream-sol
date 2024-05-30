@@ -306,7 +306,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
               ) : hostPeerIds.length > 0 ? (
                 <RemotePeer peerId={hostPeerIds[0]} />
               ) : (
-                <div className="aspect-video rounded-xl lg:w-[800px] border-white border-2 bg-slate-500" />
+                <div className="mx-auto aspect-video rounded-xl w-[368px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] bg-grey-700" />
               )}
 
               <div className="text-[1.25rem] sm:text-[1.5rem] break- font-semibold">
