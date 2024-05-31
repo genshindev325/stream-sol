@@ -75,10 +75,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
 
   const { role, updateMetadata, metadata } = useLocalPeer<TPeerMetadata>();
 
-  // const { peerIds } = usePeerIds({
-  //   roles: [Role.HOST, Role.LISTENER],
-  // });
-
   const { peerIds: hostPeerIds } = usePeerIds({
     roles: [Role.HOST],
   });
@@ -87,7 +83,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     async onMessage(payload, from, label) {
       if (label === "server-message") {
         const { s3URL } = JSON.parse(payload);
-        console.log(`Your recording: ${s3URL}`);
         try {
           const video = await createVideo({
             title: livestreamData.title,
@@ -95,9 +90,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
             thumbnail: livestreamData.thumbnail,
             url: s3URL,
           });
-          console.log(video);
+          toast.success("Stream is successfully archieved");
         } catch (err) {
-          console.log(err);
+          toast.error("Failed to archieve stream");
         }
       }
     },
@@ -371,7 +366,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
               )}
             </div>
           </div>
-          <ChatBox livestreamId={livestreamData.id}/>
+          <ChatBox livestreamId={livestreamData.id} />
         </div>
       )}
       {donated && (
