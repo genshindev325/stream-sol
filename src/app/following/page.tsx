@@ -78,7 +78,7 @@ export default function Following() {
   }
 
   return (
-    <>
+    <div className="flex flex-col flex-1 p-2 sm:p-4">
       <div className="text-[32px] my-[16px] text-center sm:text-start font-bold">
         Your Following
       </div>
@@ -143,6 +143,6 @@ export default function Following() {
           />
         </div>
       )}
-    </>
+    </div>
   );
 }

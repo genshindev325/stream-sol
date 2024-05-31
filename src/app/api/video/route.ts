@@ -53,3 +53,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const videoId = searchParams.get("videoId") as string;
+
+  try {
+    await connectMongo();
+
+    const video = await VideoModel.findByIdAndDelete(videoId);
+
+    if (!video) {
+      return NextResponse.json({}, { status: HttpStatusCode.NotFound });
+    }
+
+    return NextResponse.json({ video }, { status: HttpStatusCode.Ok });
+  } catch (err) {
+    return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
+  }
+}

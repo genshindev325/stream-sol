@@ -7,3 +7,4 @@ export { default as NoComponent } from "./NoComponent";
 export { default as NoWallet } from "./NoWallet";
 export { default as LoadMore } from "./LoadMore";
 export { default as DonateModal } from "./DonateModal";
+export { default as VideoDelete } from "./VideoDelete";

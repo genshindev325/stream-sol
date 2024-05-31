@@ -54,4 +54,5 @@ export type Video = {
   creator: string;
   roomId: string;
   url: string;
+  createdAt: string;
 };

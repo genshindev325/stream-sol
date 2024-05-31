@@ -8,7 +8,7 @@ export const fetchVideos = async ({
   pageNum,
 }: {
   publicKey: string;
-  pageNum: string;
+  pageNum: number;
 }) => {
   const { data } = await axios.get(
     `${API_CONFIG}/video/all?pubkey=${publicKey}&&pageNum=${pageNum}`
@@ -38,6 +38,19 @@ export const createVideo = async ({
   const { data } = await axios.post(
     `${API_CONFIG}/video`,
     { title, description, url, thumbnail },
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+  return data;
+};
+
+export const deleteVideo = async ({ videoId }: { videoId: string }) => {
+  const token = getAccessToken();
+  const { data } = await axios.delete(
+    `${API_CONFIG}/video?videoId=${videoId}`,
     {
       headers: {
         Authorization: "Bearer " + token,
