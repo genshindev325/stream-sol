@@ -163,9 +163,8 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       try {
         const status = await stopRecording(livestreamData.roomId);
         data = await status.data;
-        console.log("Recording URL >>>>>>>>>>>>>>>>> \n", data);
       } catch (err) {
-        console.log(err);
+        toast.error("Failed to archieve stream");
       }
     }
 

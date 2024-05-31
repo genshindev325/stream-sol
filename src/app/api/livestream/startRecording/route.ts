@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     const recording = await recorder.startRecording({
       roomId,
       token: accessToken,
+      layout: "spotlight"
     });
 
     console.log(recording);
