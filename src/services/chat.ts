@@ -5,17 +5,19 @@ import { getAccessToken } from "@/libs/helpers";
 export const creatChat = async ({
   roomId,
   sender,
+  pfp,
   content,
 }: {
   roomId: string;
   sender: string;
+  pfp?: string;
   content: string;
 }) => {
   const token = getAccessToken();
   try {
     const { data } = await axios.post(
       `${API_CONFIG}/chat`,
-      { roomId, sender, content },
+      { roomId, sender, pfp, content },
       {
         headers: {
           Authorization: "Bearer " + token,

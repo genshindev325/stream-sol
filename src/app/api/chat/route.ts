@@ -10,13 +10,12 @@ export async function POST(request: Request) {
 
     const chatData = await request.json();
 
-    console.log("Chat data: ", chatData);
-
     const livestream = await LivestreamModel.find({
       roomId: chatData.roomId,
     });
 
     const objectId = livestream[0]._id?.toString();
+    
     const newChat = new ChatModel({
       livestreamId: objectId,
       ...chatData,

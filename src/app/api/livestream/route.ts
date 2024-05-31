@@ -4,7 +4,26 @@ import connectMongo from "@/libs/connect-mongo";
 import UserModel from "@/models/user";
 import { HUDDLE_API_KEY } from "@/libs/constants";
 import LivestreamModel from "@/models/livestream";
-import ArchievedstreamModel from "@/models/archievedstream";
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const roomId = searchParams.get("roomId");
+
+  await connectMongo();
+
+  const livestream = await LivestreamModel.findOne({
+    roomId,
+  });
+
+  if (!livestream) {
+    return NextResponse.json(
+      { message: "Livestream Does Not Exist" },
+      { status: HttpStatusCode.NotFound }
+    );
+  }
+
+  return NextResponse.json({ livestream }, { status: HttpStatusCode.Ok });
+}
 
 export async function POST(request: Request) {
   const userPk = request.headers.get("user");
@@ -70,68 +89,6 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const roomId = searchParams.get("roomId");
-
-  await connectMongo();
-
-  const livestream = await LivestreamModel.findOne({
-    roomId,
-  });
-
-  if (!livestream) {
-    return NextResponse.json(
-      { message: "Livestream Does Not Exist" },
-      { status: HttpStatusCode.NotFound }
-    );
-  }
-
-  return NextResponse.json({ livestream }, { status: HttpStatusCode.Ok });
-}
-
-export async function DELETE(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const roomId = searchParams.get("roomId");
-  const video = searchParams.get("video");
-
-  try {
-    await connectMongo();
-
-    const livestream = await LivestreamModel.findOneAndDelete({
-      roomId,
-    });
-
-    if (!livestream) {
-      return NextResponse.json(
-        { message: "Livestream Does Not Exist" },
-        { status: HttpStatusCode.NotFound }
-      );
-    }
-
-    const archievedstream = new ArchievedstreamModel({
-      title: livestream.title,
-      description: livestream?.description!,
-      thumbnail: livestream.thumbnail,
-      roomId: livestream.roomId,
-      creator: livestream.creator.publickey,
-      video,
-    });
-
-    await archievedstream.save();
-
-    return NextResponse.json(
-      { Message: "Successfully deleted!" },
-      { status: HttpStatusCode.Ok }
-    );
-  } catch (err) {
-    return NextResponse.json(
-      { Message: "Failed to delete" },
-      { status: HttpStatusCode.BadRequest }
-    );
-  }
-}
-
 export async function PUT(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -164,5 +121,36 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ livestream }, { status: HttpStatusCode.Ok });
   } catch (errors: any) {
     return NextResponse.json({ status: HttpStatusCode.NotModified });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const roomId = searchParams.get("roomId");
+  const url = searchParams.get("video");
+
+  try {
+    await connectMongo();
+
+    const livestream = await LivestreamModel.findOneAndDelete({
+      roomId,
+    });
+
+    if (!livestream) {
+      return NextResponse.json(
+        { message: "Livestream Does Not Exist" },
+        { status: HttpStatusCode.NotFound }
+      );
+    }
+
+    return NextResponse.json(
+      { Message: "Successfully deleted!" },
+      { status: HttpStatusCode.Ok }
+    );
+  } catch (err) {
+    return NextResponse.json(
+      { Message: "Failed to delete" },
+      { status: HttpStatusCode.BadRequest }
+    );
   }
 }

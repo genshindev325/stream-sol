@@ -1,7 +1,8 @@
 import { useRouter } from "next/navigation";
 import { AvatarComponent } from "../common";
 import { Livestream } from "@/libs/types";
-import { formatTime } from "@/libs/helpers";
+import { formatK, formatTime } from "@/libs/helpers";
+import { GATEWAY_URL } from "@/libs/constants";
 
 type Props = {
   livestream: Livestream;
@@ -18,7 +19,7 @@ export default function Home({ livestream }: Props) {
     >
       <div className="relative w-[320px] sm:w-[240px] h-[180px] sm:h-[135px] flex justify-center items-center rounded-lg bg-black hover:cursor-pointer">
         <img
-          src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${livestream?.thumbnail}`}
+          src={`${GATEWAY_URL}/ipfs/${livestream.thumbnail}`}
           className="max-w-full max-h-full rounded-lg"
           crossOrigin="anonymous"
           alt="Avatar"
@@ -31,7 +32,7 @@ export default function Home({ livestream }: Props) {
       </div>
       <div className="flex gap-4 px-2 hover:cursor-pointer">
         <div className="rounded-full max-w-[44px] w-[44px] h-[44px]">
-          <AvatarComponent avatar={livestream.creator.avatar} size={44} />
+          <AvatarComponent avatar={livestream.creator?.avatar} size={44} />
         </div>
         <div className="flex flex-col w-[172px] text-grey-500 font-light">
           <div className="text-[0.75rem]">
@@ -39,8 +40,10 @@ export default function Home({ livestream }: Props) {
               {livestream.creator.username}
             </span>
             <div className="hidden sm:block">
-              <span className="mr-1">{livestream.views} participants</span>•
-              <span className="ml-1">{formatTime(livestream.createdAt)}</span>
+              <span className="mr-1">
+                {formatK(livestream.views)} participants
+              </span>
+              •<span className="ml-1">{formatTime(livestream.createdAt)}</span>
             </div>
           </div>
         </div>

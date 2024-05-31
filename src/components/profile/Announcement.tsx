@@ -74,7 +74,6 @@ export default function Announcement({ profile }: { profile: User }) {
     const data = await fetchAnnouncements(pk, profile.publickey, pageNum);
     setCount(data.count);
 
-    console.log(data)
     if (pageNum === 1) {
       setAnnouncements(data.announcements);
     } else {

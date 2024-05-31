@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { GATEWAY_URL } from "@/libs/constants";
 
 /// Images
 import userPic from "@/assets/svgs/user.svg";
@@ -20,7 +21,7 @@ export default function AvatarComponent({
     >
       {avatar ? (
         <img
-          src={`${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${avatar}`}
+          src={`${GATEWAY_URL}/ipfs/${avatar}`}
           className="w-full h-full rounded-full"
           crossOrigin="anonymous"
           alt="Avatar"

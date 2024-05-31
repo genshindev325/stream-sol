@@ -5,6 +5,7 @@ export interface IChat {
   roomId: string;
   sender: string;
   content: string;
+  pfp?: string;
 }
 
 export const ChatSchema = new Schema<IChat>(
@@ -25,6 +26,13 @@ export const ChatSchema = new Schema<IChat>(
     sender: {
       type: String,
       required: true,
+    },
+
+    /// Chat Sender pfp url
+    pfp: {
+      type: String,
+      required: false,
+      default: "",
     },
 
     /// Chat message content

@@ -13,6 +13,9 @@ export const HUDDLE_API_KEY = process.env.NEXT_PUBLIC_HUDDLE_API_KEY as string;
 /// Local Storage Token
 export const LOCAL_STORAGE = "mediastreamtoken";
 
+/// Pinata Gateway Url
+export const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL as string;
+
 /// API Config
 export const API_CONFIG = process.env.NEXT_PUBLIC_API_CONFIG as string;
 

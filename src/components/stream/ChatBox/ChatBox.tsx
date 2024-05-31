@@ -1,56 +1,56 @@
-import { useDataMessage, useLocalPeer } from "@huddle01/react/hooks";
 import { useEffect, useRef, useState } from "react";
-import LocalMessageBubble from "./LocalMessageBubble";
-import RemoteMessageBubble from "./RemoteMessageBubble";
+import { useParams } from "next/navigation";
+
 import { RiSendPlaneFill } from "react-icons/ri";
+import { BsEmojiSmile } from "react-icons/bs";
+
 import emojiData from "@emoji-mart/data";
 import EmojiPicker from "@emoji-mart/react";
-import { BsEmojiSmile } from "react-icons/bs";
-import { useParams } from "next/navigation";
-import { TPeerMetadata } from "@/libs/types";
+import { useDataMessage } from "@huddle01/react/hooks";
+
+import MessageBubble from "./MessageBubble";
 import { creatChat, getChatHistory } from "@/services/chat";
-import { getLivestreamByRoomId } from "@/services/livestream";
+import { useAuthContext } from "@/contexts/AuthContextProvider";
 
 export type TMessage = {
   text: string;
   sender: string;
+  pfp: string;
 };
 
-function ChatBox() {
+type Props = {
+  livestreamId: string;
+};
+function ChatBox({ livestreamId }: Props) {
   const [messages, setMessages] = useState<TMessage[]>([]);
   const [text, setText] = useState<string>("");
   const [emojiPickerVisible, setEmojiPickerVisible] = useState(false);
   const params = useParams<{ roomId: string }>();
-  const { metadata } = useLocalPeer<TPeerMetadata>();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuthContext();
 
-  const { peerId } = useLocalPeer();
   const { sendData } = useDataMessage({
     onMessage: async (payload, from, label) => {
       if (label === "chat") {
-        setMessages((prev) => [...prev, { text: payload, sender: from }]);
-        const roomId = params.roomId;
-        const chat = await creatChat({
-          roomId,
-          sender: from,
-          content: payload,
-        });
+        const sender = payload.split("00x0")[0] as string;
+        const pfp = payload.split("00x0")[1] as string;
+        const text = payload.split("00x0")[2] as string;
+        setMessages((prev) => [...prev, { text, pfp, sender }]);
       }
     },
   });
 
   useEffect(() => {
     const fetchData = async () => {
-      const { livestream } = await getLivestreamByRoomId(params.roomId);
-      const livestreamId = livestream.id;
       const { chatHistory } = await getChatHistory({ livestreamId });
 
       let allMessages = [];
       if (chatHistory) {
         allMessages = chatHistory.map((item: any) => {
           return {
-            text: item?.content,
-            sender: item?.sender,
+            text: item.content,
+            sender: item.sender,
+            pfp: item?.pfp!,
           };
         });
       }
@@ -67,13 +67,25 @@ function ChatBox() {
     }
   }, [messages]);
 
-  const sendMessage = () => {
-    sendData({
-      to: "*",
-      payload: text,
-      label: "chat",
-    });
-    setText("");
+  const sendMessage = async () => {
+    if (!user) {
+      return;
+    }
+    try {
+      const roomId = params.roomId;
+      sendData({
+        to: "*",
+        payload: user.username + "00x0" + user?.avatar! + "00x0" + text,
+        label: "chat",
+      });
+      const chat = await creatChat({
+        roomId,
+        sender: user.username,
+        pfp: user?.avatar!,
+        content: text,
+      });
+      setText("");
+    } catch (err) {}
   };
 
   return (
@@ -83,15 +95,11 @@ function ChatBox() {
       </h1>
       <div
         ref={messagesContainerRef}
-        className="flex-1 p-4 border-b border-grey-800 overflow-y-scroll break-all"
+        className="flex flex-col gap-[4px] flex-1 p-2 border-b border-grey-800 overflow-y-scroll break-all"
       >
-        {messages.map((message, index) =>
-          message.sender === peerId ? (
-            <LocalMessageBubble key={index} message={message} />
-          ) : (
-            <RemoteMessageBubble key={index} message={message} />
-          )
-        )}
+        {messages.map((message, index) => (
+          <MessageBubble key={index} message={message} />
+        ))}
       </div>
       {emojiPickerVisible && (
         <div className={"absolute right-[0px] bottom-[50px] z-10"}>

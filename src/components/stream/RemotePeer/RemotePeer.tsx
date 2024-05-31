@@ -95,13 +95,12 @@ const RemotePeer = ({ peerId }: Props) => {
   }, [screenAudio]);
 
   return (
-    <div className="mx-auto relative aspect-video rounded-xl w-[368px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] bg-grey-700">
+    <div className="mx-auto relative aspect-video rounded-xl w-[356px] sm:w-[560px] md:w-[432px] lg:w-[704px] xl:w-[640px] 2xl:w-[768px] bg-grey-700">
       {screenVideo && (
         <video
           ref={screenVideoRef}
           controls
           autoPlay
-          muted
           className="aspect-video rounded-xl w-full"
         />
       )}
@@ -110,10 +109,8 @@ const RemotePeer = ({ peerId }: Props) => {
         <div className="w-1/4 mx-auto absolute right-[0.25rem] bottom-[0.25rem]">
           <video
             ref={vidRef}
-            controls
             className="border-2 rounded-xl border-white-400 aspect-video"
             autoPlay
-            muted
           />
         </div>
       )}

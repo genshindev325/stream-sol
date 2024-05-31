@@ -33,6 +33,7 @@ export type TPeerMetadata = {
 };
 
 export type Livestream = {
+  id: string;
   title: string;
   description?: string;
   thumbnail: string;

@@ -139,7 +139,7 @@ export default function HeaderPage({
 
   if (loading) {
     return (
-      <div className="fixed top-0 left-0 w-full h-full bg-background z-40">
+      <div className="fixed top-0 left-0 w-full h-full bg-background z-[45]">
         <Image
           src={loadingGif}
           className="absolute-center"
@@ -192,7 +192,7 @@ export default function HeaderPage({
       <Image
         src={logoPic}
         alt="Picture of the Logo"
-        className="hidden md:block w-[120px] h-[28px] hover:cursor-pointer"
+        className="hidden md:block w-[120px] h-[64px] hover:cursor-pointer"
         onClick={() => router.push("/")}
         priority
       />

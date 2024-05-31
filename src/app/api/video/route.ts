@@ -33,3 +33,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
   }
 }
+
+export async function POST(request: NextRequest) {
+  const userPk = request.headers.get("user");
+  const videoData = await request.json();
+
+  try {
+    await connectMongo();
+
+    const video = new VideoModel({
+      ...videoData,
+      creator: userPk,
+    });
+
+    await video.save();
+
+    return NextResponse.json({ video }, { status: HttpStatusCode.Ok });
+  } catch (err) {
+    return NextResponse.json({}, { status: HttpStatusCode.BadRequest });
+  }
+}
