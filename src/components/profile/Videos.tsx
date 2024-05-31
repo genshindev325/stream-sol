@@ -19,7 +19,7 @@ import videoPic from "@/assets/images/video.png";
 export default function Videos({ profile }: { profile: User }) {
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
-  const [pageNum, setPageNum] = useState("1");
+  const [pageNum, setPageNum] = useState(1);
   const [videos, setVideos] = useState<Array<Video>>([]);
   const { user } = useAuthContext();
   const router = useRouter();
@@ -29,12 +29,16 @@ export default function Videos({ profile }: { profile: User }) {
     try {
       const data = await fetchVideos({
         publicKey: profile.publickey,
-        pageNum: pageNum,
+        pageNum,
       });
       setVideos(data.videos);
       setPageCount(Math.ceil(data.count / ITEMS_PER_PAGE));
     } catch (err) {}
     setLoading(false);
+  };
+
+  const handlePageClick = (event: any) => {
+    setPageNum(event.selected + 1);
   };
 
   useEffect(() => {
@@ -109,12 +113,10 @@ export default function Videos({ profile }: { profile: User }) {
                   pageCount={pageCount}
                   marginPagesDisplayed={1}
                   pageRangeDisplayed={2}
-                  onPageChange={(event: any) => {
-                    setPageNum(event.selected);
-                  }}
+                  onPageChange={handlePageClick}
                   containerClassName="pagination"
                   activeClassName="active"
-                  forcePage={parseInt(pageNum, 10)}
+                  forcePage={pageNum - 1}
                 />
               </div>
             )}
