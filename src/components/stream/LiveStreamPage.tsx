@@ -328,7 +328,14 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                   size={44}
                 />
                 <div className="flex flex-col gap-[4px]">
-                  <div className="text-[0.875rem] sm:text-[1rem] text-grey-300">
+                  <div
+                    className="text-[0.875rem] sm:text-[1rem] text-grey-300 hover:cursor-pointer"
+                    onClick={() => {
+                      router.push(
+                        `/profile/${livestreamData.creator.username}`
+                      );
+                    }}
+                  >
                     {livestreamData.creator.username}
                   </div>
                   <div className="flex justify-center items-center text-[0.75rem] sm:text-[0.875rem] text-grey-500 font-light bg-grey-700 rounded-xl px-[4px]">

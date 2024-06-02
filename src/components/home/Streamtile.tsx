@@ -27,7 +27,7 @@ export default function Home({ livestream }: Props) {
       </div>
       <div className="relative px-2">
         <div className="text-ellipsis line-clamp-2 font-bold text-[1rem] break-words mr-6">
-          Test
+          {livestream.title}
         </div>
       </div>
       <div className="flex gap-4 px-2 hover:cursor-pointer">

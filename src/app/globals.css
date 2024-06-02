@@ -4,6 +4,7 @@
 
 body {
   overflow-x: hidden;
+  background-color: #0F0C13;
 }
 
 *::-webkit-scrollbar-track {
