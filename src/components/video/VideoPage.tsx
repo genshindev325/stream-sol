@@ -121,7 +121,7 @@ export default function VideoPage({ videoData }: Props) {
                 src={videoData.video}
                 className="aspect-video rounded-xl lg:w-[800px]"
                 playsInline
-                // controls
+                controls
               />
             </div>
 
