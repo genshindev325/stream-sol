@@ -35,7 +35,10 @@ function ChatBox({ livestreamId }: Props) {
         const sender = payload.split("00x0")[0] as string;
         const pfp = payload.split("00x0")[1] as string;
         const text = payload.split("00x0")[2] as string;
-        setMessages((prev) => [...prev, { text, pfp, sender }]);
+        setMessages((prev) => [
+          ...prev,
+          { text, pfp: pfp === "none" ? "" : pfp, sender },
+        ]);
       }
     },
   });
@@ -75,7 +78,8 @@ function ChatBox({ livestreamId }: Props) {
       const roomId = params.roomId;
       sendData({
         to: "*",
-        payload: user.username + "00x0" + user?.avatar! + "00x0" + text,
+        payload:
+          user.username + "00x0" + (user?.avatar || "none") + "00x0" + text,
         label: "chat",
       });
       const chat = await creatChat({

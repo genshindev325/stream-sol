@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
     const videos = await LivestreamModel.find(query)
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 

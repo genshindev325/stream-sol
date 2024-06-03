@@ -47,6 +47,7 @@ export type Livestream = {
   roomId: string;
   createdAt: string;
   recording: boolean;
+  archived: boolean;
 };
 
 export type Video = {

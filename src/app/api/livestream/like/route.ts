@@ -18,10 +18,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!slike) {
-    return NextResponse.json(
-      { statue: "none" },
-      { status: HttpStatusCode.NotFound }
-    );
+    return NextResponse.json({ status: "none" }, { status: HttpStatusCode.Ok });
   }
 
   return NextResponse.json(

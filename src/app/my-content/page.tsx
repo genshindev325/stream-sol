@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 /// React Icons
-import { RiDeleteBinLine, RiEdit2Line } from "react-icons/ri";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 /// Built-in Modules
 import ReactPaginate from "react-paginate";
@@ -23,7 +23,7 @@ import {
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { fetchAllVideos } from "@/services/video";
 import { formatTime } from "@/libs/helpers";
-import type { Video } from "@/libs/types";
+import type { Livestream } from "@/libs/types";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 
 /// Images
@@ -33,7 +33,7 @@ export default function MyContent() {
   const [selectedDelete, setSelectedDelete] = useState("");
   const [pageNum, setPageNum] = useState(1);
   const [pageCount, setPageCount] = useState(1);
-  const [videos, setVideos] = useState<Array<Video>>([]);
+  const [videos, setVideos] = useState<Array<Livestream>>([]);
   const [loading, setLoading] = useState(false);
   const [refetch, setRefetch] = useState(false);
   const searchParams = useSearchParams();
@@ -110,6 +110,15 @@ export default function MyContent() {
                     <div className="flex flex-col gap-2 w-full text-[0.875rem] sm:text-[1rem]">
                       <div className="text-ellipsis line-clamp-2">
                         {video.title}
+                        <span className="text-[0.75rem] sm:text-[0.875rem] text-grey-700">
+                          (
+                          {video.archived
+                            ? video.video === ""
+                              ? "Not Archived"
+                              : "Archived"
+                            : "Live"}
+                          )
+                        </span>
                       </div>
                       <div className="text-grey-500 text-[0.75rem] sm:text-[0.875rem]">
                         {formatTime(video.createdAt)}
