@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import UserModel from "@/models/user";
 import FollowModel from "@/models/follow";
 import AnnouncementModel from "@/models/announcement";
+import LivestreamModel from "@/models/livestream";
 import AlikeModel from "@/models/alike";
 
 const MONGO_URI = process.env.MONGODB_URI as string;
@@ -55,6 +56,17 @@ async function connectMongo() {
           {
             $set: {
               user: change.fullDocument,
+            },
+          }
+        );
+
+        await LivestreamModel.updateMany(
+          {
+            "creator._id": change.documentKey._id,
+          },
+          {
+            $set: {
+              creator: change.fullDocument,
             },
           }
         );
