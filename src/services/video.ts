@@ -2,8 +2,22 @@ import { API_CONFIG } from "@/libs/constants";
 import axios from "axios";
 import { getAccessToken } from "@/libs/helpers";
 
-// To fetch videos
-export const fetchVideos = async ({
+// To fetch archived videos
+export const fetchArchivedVideos = async ({
+  publicKey,
+  pageNum,
+}: {
+  publicKey: string;
+  pageNum: number;
+}) => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/video/archived?pubkey=${publicKey}&&pageNum=${pageNum}`
+  );
+  return data;
+};
+
+// To fetch all videos
+export const fetchAllVideos = async ({
   publicKey,
   pageNum,
 }: {

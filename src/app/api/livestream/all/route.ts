@@ -1,4 +1,3 @@
-import Livestream from "@/app/livestream/[roomId]/page";
 import connectMongo from "@/libs/connect-mongo";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import LivestreamModel from "@/models/livestream";

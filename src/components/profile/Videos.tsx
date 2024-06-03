@@ -11,7 +11,7 @@ import { NoComponent, PageLoading, NoWallet } from "@/components/common";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Video, User } from "@/libs/types";
-import { fetchVideos } from "@/services/video";
+import { fetchArchivedVideos } from "@/services/video";
 
 /// Images
 import videoPic from "@/assets/images/video.png";
@@ -27,7 +27,7 @@ export default function Videos({ profile }: { profile: User }) {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await fetchVideos({
+      const data = await fetchArchivedVideos({
         publicKey: profile.publickey,
         pageNum,
       });
@@ -58,7 +58,7 @@ export default function Videos({ profile }: { profile: User }) {
       ) : (
         <>
           <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
-            <div className="flex flex-wrap justify-between md:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
+            <div className="flex flex-wrap justify-center lg:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
               {videos.map((video) => {
                 return (
                   <div

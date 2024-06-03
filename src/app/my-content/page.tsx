@@ -21,7 +21,7 @@ import {
 
 /// Utils
 import { useAuthContext } from "@/contexts/AuthContextProvider";
-import { fetchVideos } from "@/services/video";
+import { fetchAllVideos } from "@/services/video";
 import { formatTime } from "@/libs/helpers";
 import type { Video } from "@/libs/types";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
@@ -47,7 +47,7 @@ export default function MyContent() {
       (async function () {
         setLoading(true);
         try {
-          const data = await fetchVideos({
+          const data = await fetchAllVideos({
             publicKey: publicKey.toBase58(),
             pageNum,
           });
@@ -85,9 +85,7 @@ export default function MyContent() {
           <div className="mt-0 sm:mt-6">
             <div className="flex gap-2 items-center w-full px-4 py-2 font-semibold text-[1rem]">
               <div className="w-[90%]">Content</div>
-              <span className="hidden lg:block w-[10%] text-center">
-                Delete
-              </span>
+              <span className="w-[10%] text-center">Delete</span>
             </div>
             {videos.map((video, idx) => {
               return (

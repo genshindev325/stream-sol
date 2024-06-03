@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     await connectMongo();
 
     let query = {
+      archived: true,
+      video: { $ne: "" },
       "creator.publickey": pubkey,
     };
     const skip = (page - 1) * ITEMS_PER_PAGE;
