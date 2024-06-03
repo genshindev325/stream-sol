@@ -45,6 +45,7 @@ export async function POST(request: Request) {
 
     const stream = await LivestreamModel.findOne({
       "creator.publickey": userPk,
+      archived: false,
     });
 
     if (stream) {
@@ -90,32 +91,25 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const roomId = searchParams.get("roomId");
-    const inc = searchParams.get("inc") as string;
+  const searchParams = request.nextUrl.searchParams;
+  const roomId = searchParams.get("roomId") as string;
+  const livestreamData = await request.json();
 
+  try {
     await connectMongo();
 
-    const livestream = await LivestreamModel.findOne({
-      roomId,
-    });
+    const livestream = await LivestreamModel.findOneAndUpdate(
+      {
+        roomId,
+      },
+      { ...livestreamData }
+    );
 
     if (!livestream) {
       return NextResponse.json(
         { message: "Livestream Does Not Exist" },
         { status: HttpStatusCode.NotFound }
       );
-    }
-
-    let views = livestream.views - 1;
-    if (inc === "1") {
-      views = livestream.views + 1;
-    }
-
-    if (views >= 0) {
-      livestream.views = views;
-      await livestream.save();
     }
 
     return NextResponse.json({ livestream }, { status: HttpStatusCode.Ok });
@@ -127,13 +121,13 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const roomId = searchParams.get("roomId");
-  const url = searchParams.get("video");
 
   try {
     await connectMongo();
 
-    const livestream = await LivestreamModel.findOneAndDelete({
+    const livestream = await LivestreamModel.findOne({
       roomId,
+      archived: false,
     });
 
     if (!livestream) {
@@ -142,6 +136,9 @@ export async function DELETE(request: NextRequest) {
         { status: HttpStatusCode.NotFound }
       );
     }
+
+    livestream.archived = true;
+    await livestream.save();
 
     return NextResponse.json(
       { Message: "Successfully deleted!" },

@@ -18,8 +18,10 @@ import { useEffect, useRef, useState } from "react";
 /// Built-in
 import { Role } from "@huddle01/server-sdk/auth";
 import toast from "react-hot-toast";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Icons
+import { BiLike, BiDislike } from "react-icons/bi";
 import { FaDollarSign, FaWindowClose } from "react-icons/fa";
 import { LuScreenShare, LuScreenShareOff } from "react-icons/lu";
 import {
@@ -36,12 +38,16 @@ import {
   decreaseViews,
   startRecording,
   stopRecording,
+  doLikeLivestream,
+  getLikeStatus,
+  doDislikeLivestream,
 } from "@/services/livestream";
-import { getRoomAccessToken } from "@/services/room";
-import { createVideo } from "@/services/video";
 import { FullLoading, AvatarComponent, DonateModal } from "../common";
+import { getRoomAccessToken } from "@/services/room";
+import { archiveVideo } from "@/services/video";
 import useKeyboardStatus from "@/hooks/useKeyboardStatus";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
+import { follow, isFollower } from "@/services/profile";
 
 type Props = {
   livestreamData: Livestream;
@@ -57,12 +63,18 @@ export default function LiveStreamPage({ livestreamData }: Props) {
   const { user } = useAuthContext();
   const router = useRouter();
   const [donated, setDonated] = useState<boolean>(false);
+  const [followed, setFollowed] = useState<boolean>(false);
   const keyboardHeight = useKeyboardStatus();
+  const { publicKey } = useWallet();
 
-  const { joinRoom, state, closeRoom, leaveRoom } = useRoom({
+  const [liked, setLiked] = useState("");
+  const [likes, setLikes] = useState(livestreamData.likes);
+  const [dislikes, setDislikes] = useState(livestreamData.dislikes);
+
+  const { joinRoom, state, closeRoom } = useRoom({
     onJoin: async (room) => {
       try {
-        const response = await increaseViews(livestreamData.roomId);
+        await increaseViews(livestreamData.roomId);
         updateMetadata({ displayName });
       } catch (err) {}
     },
@@ -84,11 +96,9 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       if (label === "server-message") {
         const { s3URL } = JSON.parse(payload);
         try {
-          const video = await createVideo({
-            title: livestreamData.title,
-            description: livestreamData?.description!,
-            thumbnail: livestreamData.thumbnail,
-            url: s3URL,
+          await archiveVideo({
+            roomId: livestreamData.roomId,
+            video: s3URL,
           });
           toast.success("Stream is successfully archieved");
         } catch (err) {
@@ -97,12 +107,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       }
     },
   });
-
-  useEffect(() => {
-    return () => {
-      leaveStream();
-    };
-  }, []);
 
   useEffect(() => {
     if (stream && videoRef.current) {
@@ -124,6 +128,27 @@ export default function LiveStreamPage({ livestreamData }: Props) {
       router.push(`/`);
     }
   }, [state]);
+
+  useEffect(() => {
+    if (publicKey) {
+      (async function () {
+        setLoading(true);
+        try {
+          const _followed = await isFollower(
+            livestreamData.creator.publickey,
+            publicKey.toBase58()
+          );
+          const { status } = await getLikeStatus(
+            livestreamData.id,
+            publicKey.toBase58()
+          );
+          setLiked(status);
+          setFollowed(_followed);
+        } catch (err) {}
+        setLoading(false);
+      })();
+    }
+  }, [publicKey]);
 
   const joinStream = async () => {
     const roomId = livestreamData.roomId;
@@ -178,15 +203,6 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     setLoading(false);
   };
 
-  const leaveStream = async () => {
-    try {
-      leaveRoom();
-      await decreaseViews(livestreamData.roomId);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
   const handleVideo = async () => {
     try {
       if (isVideoOn) {
@@ -223,6 +239,59 @@ export default function LiveStreamPage({ livestreamData }: Props) {
     }
   };
 
+  const doLike = async () => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const { like, livestream } = await doLikeLivestream(livestreamData.id);
+      setLiked(like);
+      setLikes(livestream.likes);
+      setDislikes(livestream.dislikes);
+    } catch (err) {}
+    setLoading(false);
+  };
+
+  const doDislike = async () => {
+    if (!publicKey) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const { like, livestream } = await doDislikeLivestream(livestreamData.id);
+      setLiked(like);
+      setLikes(livestream.likes);
+      setDislikes(livestream.dislikes);
+    } catch (err) {}
+    setLoading(false);
+  };
+
+  const doFollow = async () => {
+    if (!user) {
+      toast.error("Connect your wallet", { duration: 3000 });
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await follow(livestreamData.creator.publickey);
+      setFollowed(data.follow);
+    } catch (err: any) {
+      toast.error(`Failed to ${followed ? "Unfollow" : "Follow"}`, {
+        duration: 3000,
+      });
+    }
+    setLoading(false);
+  };
+
   return (
     <>
       {loading && <FullLoading />}
@@ -251,6 +320,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                       className="aspect-video rounded-xl w-full"
                       controls
                       autoPlay
+                      playsInline
                       muted
                     />
                   )}
@@ -261,6 +331,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                         ref={videoRef}
                         className="aspect-video rounded-xl"
                         autoPlay
+                        playsInline
                         muted
                       />
                     </div>
@@ -346,14 +417,62 @@ export default function LiveStreamPage({ livestreamData }: Props) {
                 </div>
               </div>
               {user?.publickey !== livestreamData.creator.publickey && (
-                <div
-                  className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] sm:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold"
-                  onClick={() => {
-                    setDonated(true);
-                  }}
-                >
-                  <FaDollarSign />
-                  Donate
+                <div className="flex flex-col lg:flex-row items-end lg:items-center gap-4">
+                  <div className="flex rounded-lg border border-grey-800 h-[36px] sm:h-[44px] w-[160px] text-[0.875rem] sm:text-[1rem] ">
+                    <div
+                      className={
+                        "flex items-center justify-center gap-[8px] w-[80px] border-r border-grey-800 hover:cursor-pointer" +
+                        (liked === "like"
+                          ? " text-primary-300"
+                          : " text-grey-300")
+                      }
+                      onClick={doLike}
+                    >
+                      <BiLike
+                        size={18}
+                        color={liked === "like" ? "#A154FF" : ""}
+                      />
+                      {likes}
+                    </div>
+                    <div
+                      className={
+                        "flex items-center justify-center gap-[8px] w-[80px] hover:cursor-pointer" +
+                        (liked === "dislike"
+                          ? " text-primary-300"
+                          : " text-grey-300")
+                      }
+                      onClick={doDislike}
+                    >
+                      <BiDislike
+                        size={18}
+                        color={liked === "dislike" ? "#A154FF" : ""}
+                      />
+                      {dislikes}
+                    </div>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    <div
+                      className={
+                        "w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] lg:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold" +
+                        (followed
+                          ? " bg-white text-primary-300"
+                          : " bg-primary-300")
+                      }
+                      onClick={doFollow}
+                    >
+                      {followed ? "Unfollow" : "Follow"}
+                    </div>
+
+                    <div
+                      className="bg-white text-BG text-black w-[120px] xl:w-[140px] h-[36px] xl:h-[48px] text-[0.875rem] lg:text-[1rem] rounded-lg flex justify-center items-center hover:cursor-pointer font-bold"
+                      onClick={() => {
+                        setDonated(true);
+                      }}
+                    >
+                      <FaDollarSign />
+                      Donate
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

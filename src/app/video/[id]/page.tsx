@@ -11,10 +11,10 @@ type Props = {
 export default async function RecordingVideo({ params }: Props) {
   const videoId = params.id;
   try {
-    const { video, user } = await getVideoById({
+    const { video } = await getVideoById({
       videoId,
     });
-    return <VideoPage videoData={video} userData={user} />;
+    return <VideoPage videoData={video} />;
   } catch (err) {
     redirect("/not-found");
   }

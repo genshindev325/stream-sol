@@ -23,21 +23,17 @@ export const getVideoById = async ({ videoId }: { videoId: string }) => {
 };
 
 // Create Video
-export const createVideo = async ({
-  title,
-  description,
-  url,
-  thumbnail,
+export const archiveVideo = async ({
+  roomId,
+  video,
 }: {
-  title: string;
-  description: string;
-  url: string;
-  thumbnail: string;
+  roomId: string;
+  video: string;
 }) => {
   const token = getAccessToken();
-  const { data } = await axios.post(
-    `${API_CONFIG}/video`,
-    { title, description, url, thumbnail },
+  const { data } = await axios.put(
+    `${API_CONFIG}/livestream?roomId=${roomId}`,
+    { video },
     {
       headers: {
         Authorization: "Bearer " + token,

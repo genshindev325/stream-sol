@@ -12,7 +12,10 @@ export async function GET(request: NextRequest) {
 
   await connectMongo();
 
-  let query = { title: { $regex: `.*${search}.*`, $options: "i" } };
+  let query = {
+    archived: false,
+    title: { $regex: `.*${search}.*`, $options: "i" },
+  };
   const skip = (page - 1) * ITEMS_PER_PAGE;
 
   const livestreams = await LivestreamModel.find(query)
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
     .skip(skip)
     .limit(ITEMS_PER_PAGE);
 
-  const allLivestreams = await LivestreamModel.find({});
+  const allLivestreams = await LivestreamModel.find(query);
 
   if (!livestreams) {
     return NextResponse.json(

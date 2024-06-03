@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import connectMongo from "@/libs/connect-mongo";
 import { HttpStatusCode } from "axios";
-import VideoModel from "@/models/video";
+import LivestreamModel from "@/models/livestream";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 
 export async function GET(request: NextRequest) {
@@ -17,14 +17,18 @@ export async function GET(request: NextRequest) {
   try {
     await connectMongo();
 
-    let query = { creator: pubkey };
+    let query = {
+      archived: true,
+      video: { $ne: "" },
+      "creator.publickey": pubkey,
+    };
     const skip = (page - 1) * ITEMS_PER_PAGE;
 
-    const videos = await VideoModel.find(query)
+    const videos = await LivestreamModel.find(query)
       .skip(skip)
       .limit(ITEMS_PER_PAGE);
 
-    const count = await VideoModel.countDocuments({});
+    const count = await LivestreamModel.countDocuments(query);
 
     return NextResponse.json({ videos, count }, { status: HttpStatusCode.Ok });
   } catch (err) {

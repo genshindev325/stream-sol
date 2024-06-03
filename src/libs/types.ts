@@ -35,11 +35,14 @@ export type TPeerMetadata = {
 export type Livestream = {
   id: string;
   title: string;
-  description?: string;
+  description: string;
   thumbnail: string;
+  video: string;
   text: string;
   link: string;
   views: number;
+  likes: number;
+  dislikes: number;
   creator: User;
   roomId: string;
   createdAt: string;

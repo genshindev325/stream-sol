@@ -18,7 +18,7 @@ export const createLivestream = async ({
   const token = getAccessToken();
   const { data } = await axios.post(
     `${API_CONFIG}/livestream`,
-    { title, description, text, link, views: 1, thumbnail },
+    { title, text, description, link, thumbnail },
     {
       headers: {
         Authorization: "Bearer " + token,
@@ -70,7 +70,7 @@ export const stopRecording = async (roomId: string) => {
 export const increaseViews = async (roomId: string) => {
   const token = getAccessToken();
   const data = await axios.put(
-    `${API_CONFIG}/livestream?roomId=${roomId}&inc=1`,
+    `${API_CONFIG}/livestream/views?roomId=${roomId}&inc=1`,
     {},
     {
       headers: {
@@ -84,13 +84,50 @@ export const increaseViews = async (roomId: string) => {
 export const decreaseViews = async (roomId: string) => {
   const token = getAccessToken();
   const data = await axios.put(
-    `${API_CONFIG}/livestream?roomId=${roomId}&inc=0`,
+    `${API_CONFIG}/livestream/views?roomId=${roomId}&inc=0`,
     {},
     {
       headers: {
         Authorization: "Bearer " + token,
       },
     }
+  );
+  return data;
+};
+
+/// To like or cancel like
+export const doLikeLivestream = async (id: string) => {
+  const token = getAccessToken();
+  const { data } = await axios.post(
+    `${API_CONFIG}/livestream/like?id=${id}&liked=true`,
+    {},
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+  return data;
+};
+
+/// To dislike or cancel dislike
+export const doDislikeLivestream = async (id: string) => {
+  const token = getAccessToken();
+  const { data } = await axios.post(
+    `${API_CONFIG}/livestream/like?id=${id}`,
+    {},
+    {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    }
+  );
+  return data;
+};
+
+export const getLikeStatus = async (id: string, pubkey: string) => {
+  const { data } = await axios.get(
+    `${API_CONFIG}/livestream/like?id=${id}&pubkey=${pubkey}`
   );
   return data;
 };

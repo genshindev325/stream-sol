@@ -3,10 +3,14 @@ import { IUser, UserSchema } from "./user";
 
 export interface ILivestream {
   title: string;
-  description?: string;
+  description: string;
   thumbnail: string;
+  video: string;
+  archived: boolean;
   text: string;
   link: string;
+  likes: number;
+  dislikes: number;
   views: number;
   creator: IUser;
   roomId: string;
@@ -15,61 +19,59 @@ export interface ILivestream {
 
 export const LivestreamSchema = new Schema<ILivestream>(
   {
-    /// Title
     title: {
       type: String,
       required: true,
       max: 100,
     },
-
-    /// Description
     description: {
       type: String,
-      required: false,
+      default: "",
       max: 200,
     },
-
-    /// Thumbnails
     thumbnail: {
       type: String,
       required: true,
     },
-
-    /// Text
+    video: {
+      type: String,
+      default: "",
+    },
+    archived: {
+      type: Boolean,
+      default: false,
+    },
     text: {
       type: String,
       required: true,
     },
-
-    /// Link
     link: {
       type: String,
       required: true,
     },
-
-    /// Views
     views: {
       type: Number,
-      required: true,
-      default: 1,
+      default: 0,
     },
-
-    /// Creator
     creator: {
       type: UserSchema,
       required: true,
     },
-
-    /// Huddle Room Id
     roomId: {
       type: String,
       required: true,
       index: true,
     },
-
+    likes: {
+      type: Number,
+      default: 0,
+    },
+    dislikes: {
+      type: Number,
+      default: 0,
+    },
     recording: {
       type: Boolean,
-      required: true,
       default: false,
     },
   },
@@ -78,6 +80,13 @@ export const LivestreamSchema = new Schema<ILivestream>(
     toJSON: {
       versionKey: false,
       virtuals: true,
+      transform: (_, ret) => {
+        ret.id = ret._id.toString();
+        delete ret._id;
+      },
+    },
+    toObject: {
+      versionKey: false,
       transform: (_, ret) => {
         ret.id = ret._id.toString();
         delete ret._id;

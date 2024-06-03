@@ -101,6 +101,7 @@ const RemotePeer = ({ peerId }: Props) => {
           ref={screenVideoRef}
           controls
           autoPlay
+          playsInline
           className="aspect-video rounded-xl w-full"
         />
       )}
@@ -111,6 +112,7 @@ const RemotePeer = ({ peerId }: Props) => {
             ref={vidRef}
             className="border-2 rounded-xl border-white-400 aspect-video"
             autoPlay
+            playsInline
           />
         </div>
       )}
