@@ -10,7 +10,7 @@ type Props = {
 export default function NoComponent({ content }: Props) {
   return (
     <div className="flex flex-col flex-1 items-center justify-center gap-[12px] text-[1.5rem] sm:text-[2rem] font-semibold p-[32px]">
-      <Image src={whiteLogoPic} alt="Comments" width={64} height={64} />
+      <Image src={whiteLogoPic} alt="Comments" width={80} height={80} />
       {content}
     </div>
   );
