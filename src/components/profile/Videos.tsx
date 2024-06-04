@@ -13,9 +13,6 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { Video, User } from "@/libs/types";
 import { fetchArchivedVideos } from "@/services/video";
 
-/// Images
-import videoPic from "@/assets/images/video.png";
-
 export default function Videos({ profile }: { profile: User }) {
   const [loading, setLoading] = useState(false);
   const [pageCount, setPageCount] = useState(0);
@@ -54,7 +51,7 @@ export default function Videos({ profile }: { profile: User }) {
       {loading ? (
         <PageLoading />
       ) : pageCount === 0 ? (
-        <NoComponent content="No Videos" source={videoPic} />
+        <NoComponent content="No Videos" />
       ) : (
         <>
           <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">

@@ -23,9 +23,6 @@ import {
 import { Announcement as AnnouncementProps } from "@/libs/types";
 import { useAuthContext } from "@/contexts/AuthContextProvider";
 
-/// Images
-import announcementPic from "@/assets/images/announcement.png";
-
 export default function Announcement({ profile }: { profile: User }) {
   const [content, setContent] = useState("");
   const [pageNum, setPageNum] = useState(1);
@@ -162,7 +159,7 @@ export default function Announcement({ profile }: { profile: User }) {
         </div>
       )}
       {announcements.length === 0 ? (
-        <NoComponent content="No Announcements" source={announcementPic} />
+        <NoComponent content="No Announcements" />
       ) : (
         announcements.map((announcement, idx) => {
           return (

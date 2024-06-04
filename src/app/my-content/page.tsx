@@ -26,9 +26,6 @@ import { formatTime } from "@/libs/helpers";
 import type { Livestream } from "@/libs/types";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 
-/// Images
-import videoPic from "@/assets/images/video.png";
-
 export default function MyContent() {
   const [selectedDelete, setSelectedDelete] = useState("");
   const [pageNum, setPageNum] = useState(1);
@@ -79,7 +76,7 @@ export default function MyContent() {
         My Content
       </div>
       {videos.length === 0 ? (
-        <NoComponent content="No Content" source={videoPic} />
+        <NoComponent content="No Content" />
       ) : (
         <>
           <div className="mt-0 sm:mt-6">

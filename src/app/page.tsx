@@ -7,9 +7,6 @@ import { LoadMore, PageLoading, NoComponent } from "@/components/common";
 import { getAllLivestreams } from "@/services/livestream";
 import { ITEMS_PER_PAGE } from "@/libs/constants";
 import Streamtile from "@/components/home/Streamtile";
-
-/// Images
-import videoPic from "@/assets/images/video.png";
 import { Livestream } from "@/libs/types";
 
 export default function Main() {
@@ -61,7 +58,7 @@ export default function Main() {
   }
 
   if (livestreams.length === 0) {
-    return <NoComponent content="No Livestream" source={videoPic} />;
+    return <NoComponent content="No Livestream" />;
   }
 
   return (

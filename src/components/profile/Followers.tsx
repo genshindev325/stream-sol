@@ -20,9 +20,6 @@ import { useAuthContext } from "@/contexts/AuthContextProvider";
 import { User } from "@/libs/types";
 import { follow } from "@/services/profile";
 
-/// Images
-import peoplePic from "@/assets/images/people.png";
-
 type Follower = {
   followed: boolean;
   user: User;
@@ -74,7 +71,7 @@ export default function Followers({ profile }: { profile: User }) {
       {loading ? (
         <PageLoading />
       ) : pageCount === 0 ? (
-        <NoComponent content="No Followers" source={peoplePic} />
+        <NoComponent content="No Followers" />
       ) : (
         <>
           <div className="flex flex-col px-[16px] gap-[16px]">
