@@ -66,6 +66,7 @@ export default function SiderPage({
           src={logoPic}
           alt="Picture of the Logo"
           className="w-[120px] h-[64px]"
+          priority
         />
       </div>
 

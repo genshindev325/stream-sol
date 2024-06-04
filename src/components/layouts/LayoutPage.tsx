@@ -1,6 +1,7 @@
 "use client"; // This is a client component
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import HeaderPage from "./HeaderPage";
 import SiderPage from "./SiderPage";
 
@@ -23,6 +24,11 @@ export default function LayoutPage({
   children: React.ReactNode;
 }) {
   const [siderVisible, setSiderVisible] = useState<boolean>(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setSiderVisible(false);
+  }, [pathname]);
 
   return (
     <main className="flex min-h-dvh flex-col bg-background text-white">
