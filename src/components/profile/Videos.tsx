@@ -51,10 +51,10 @@ export default function Videos({ profile }: { profile: User }) {
       {loading ? (
         <PageLoading />
       ) : pageCount === 0 ? (
-        <NoComponent content="No Videos" />
+        <NoComponent content="No Video" />
       ) : (
         <>
-          <div className="flex flex-1 flex-col p-[12px] sm:p-[16px]">
+          <div className="flex flex-1 flex-col">
             <div className="flex flex-wrap justify-center lg:justify-start gap-[0.5rem] sm:gap-[1rem] py-[16px]">
               {videos.map((video) => {
                 return (

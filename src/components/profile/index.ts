@@ -4,6 +4,7 @@ import BannerUpload from "./BannerUpload";
 import Followers from "./Followers";
 import ProfilePage from "./ProfilePage";
 import Videos from "./Videos";
+import LiveBroadcast from "./LiveBroadcast";
 
 export {
   Announcement,
@@ -12,4 +13,5 @@ export {
   Followers,
   ProfilePage,
   Videos,
+  LiveBroadcast,
 };

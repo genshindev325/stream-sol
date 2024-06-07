@@ -14,9 +14,7 @@ import toast from "react-hot-toast";
 import { useWallet } from "@solana/wallet-adapter-react";
 
 /// Custom Import
-import Announcement from "./Announcement";
-import Followers from "./Followers";
-import Videos from "./Videos";
+import { Videos, LiveBroadcast, Announcement, Followers } from ".";
 import { FullLoading, DonateModal } from "@/components/common";
 import { addressShow, formatK } from "@/libs/helpers";
 import { isFollower, follow } from "@/services/profile";
@@ -45,6 +43,17 @@ export default function ProfilePage({ profile }: Props) {
     params.delete("tab");
     params.set("tab", value);
     router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  const Tab = () => {
+    if (tab === "stream") {
+      return <LiveBroadcast profile={profile} />;
+    } else if (tab === "announcements") {
+      return <Announcement profile={profile} />;
+    } else if (tab === "followers") {
+      return <Followers profile={profile} />;
+    }
+    return <Videos profile={profile} />;
   };
 
   const doFollow = async () => {
@@ -81,8 +90,13 @@ export default function ProfilePage({ profile }: Props) {
   }, [publicKey]);
 
   useEffect(() => {
-    if (tab !== "videos" && tab !== "announcements" && tab !== "followers") {
-      selectTab("videos");
+    if (
+      tab !== "stream" &&
+      tab !== "videos" &&
+      tab !== "announcements" &&
+      tab !== "followers"
+    ) {
+      selectTab("stream");
     }
   }, [tab]);
 
@@ -200,6 +214,19 @@ export default function ProfilePage({ profile }: Props) {
           <div
             className={
               "text-center py-2 hover:cursor-pointer font-semibold" +
+              (tab === "stream"
+                ? " text-white border-b border-white"
+                : " text-grey-500")
+            }
+            onClick={() => {
+              selectTab("stream");
+            }}
+          >
+            Live
+          </div>
+          <div
+            className={
+              "text-center py-2 hover:cursor-pointer font-semibold" +
               (tab === "videos"
                 ? " text-white border-b border-white"
                 : " text-grey-500")
@@ -237,13 +264,7 @@ export default function ProfilePage({ profile }: Props) {
             Followers
           </div>
         </div>
-        {tab === "followers" ? (
-          <Followers profile={profile} />
-        ) : tab === "announcements" ? (
-          <Announcement profile={profile} />
-        ) : (
-          <Videos profile={profile} />
-        )}
+        {Tab()}
       </div>
 
       {donated && (

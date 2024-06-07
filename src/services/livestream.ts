@@ -41,6 +41,11 @@ export const endLivestream = async (roomId: string) => {
   return data;
 };
 
+export const getLivestreamsByUser = async (pubkey: string) => {
+  const { data } = await axios.get(`${API_CONFIG}/livestream/user?pubkey=${pubkey}`);
+  return data;
+};
+
 export const getLivestreamByRoomId = async (roomId: string) => {
   const { data } = await axios.get(`${API_CONFIG}/livestream?roomId=${roomId}`);
   return data;
