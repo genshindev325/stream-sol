@@ -229,7 +229,7 @@ export default function ProfilePage({ profile }: Props) {
               "text-center py-2 hover:cursor-pointer font-semibold" +
               (tab === "videos"
                 ? " text-white border-b border-white"
-                : " text-grey-500")
+                : " text-grey-500") 
             }
             onClick={() => {
               selectTab("videos");

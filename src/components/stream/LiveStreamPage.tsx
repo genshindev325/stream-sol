@@ -102,7 +102,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
           });
           toast.success("Stream is successfully archieved");
         } catch (err) {
-          toast.error("Failed to archieve stream");
+          toast.error("Failed to archive stream");
         }
       }
     },
@@ -189,7 +189,7 @@ export default function LiveStreamPage({ livestreamData }: Props) {
         const status = await stopRecording(livestreamData.roomId);
         data = await status.data;
       } catch (err) {
-        toast.error("Failed to archieve stream");
+        toast.error("Failed to archive stream");
       }
     }
 
